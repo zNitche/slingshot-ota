@@ -1,0 +1,14 @@
+services:
+  slingshot_backend:
+    command: gunicorn -c gunicorn.conf.py app:app --preload
+    container_name: slingshot-backend
+    restart: unless-stopped
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    user: "slingshot_user"
+    ports:
+      - 8008:8080
+    env_file: ".env"
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
