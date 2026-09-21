@@ -10,9 +10,13 @@
     },
     "dependencies": {
         "react": "19.2.8",
-        "react-dom": "19.2.8"
+        "react-dom": "19.2.8",
+        "@capacitor/core": "8.5.2",
+        "@capacitor/ios": "8.5.2",
+        "@capacitor/android": "8.5.2"
     },
     "devDependencies": {
+        "@capacitor/cli": "8.5.2",
         "@eslint/js": "10.0.1",
         "@types/node": "24.13.3",
         "@types/react": "19.2.18",
