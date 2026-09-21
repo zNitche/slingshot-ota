@@ -1,9 +1,14 @@
 from slingshot_be import create_app
+from config import AppConfig
+from load_dotenv import load_dotenv
 
+load_dotenv(".env")
 
-app = create_app()
+app = create_app(config_class=AppConfig)
 
 
 if __name__ == "__main__":
-    app.run(debug=True, host="0.0.0.0", port=8080,
+    DEBUG_MODE = app.config["DEBUG"]
+
+    app.run(debug=DEBUG_MODE, host="0.0.0.0", port=8080,
             threaded=True, load_dotenv=False)
