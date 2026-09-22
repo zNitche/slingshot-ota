@@ -1,0 +1,11 @@
+services:
+  slingshot_node_worker:
+    container_name: slingshot_node_worker_devcontainer
+    build: .
+    restart: "no"
+    user: "slingshot_node"
+    volumes:
+      - ..:/workspace
+      - /etc/localtime:/etc/localtime:ro
+    # ports:
+    #   - 8080:8080
