@@ -2,11 +2,11 @@
 import PackageDescription
 
 let package = Package(
-    name: "CapacitorPlugin",
+    name: "SlingshotOta",
     platforms: [.iOS(.v15)],
     products: [
         .library(
-            name: "CapacitorPlugin",
+            name: "SlingshotOta",
             targets: ["SlingshotPlugin"])
     ],
     dependencies: [
