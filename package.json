@@ -11,6 +11,6 @@
   "author": "zNitche",
   "workspaces": [
     "example_app",
-    "capacitor_plugin"
+    "slingshot_updater_plugin"
   ]
 }

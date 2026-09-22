@@ -1,8 +1,8 @@
-package sh.znitche.slingshot;
+package sh.znitche.slingshotupdater;
 
 import com.getcapacitor.Logger;
 
-public class Slingshot {
+public class SlingshotUpdater {
 
     public String echo(String value) {
         Logger.info("Echo", value);

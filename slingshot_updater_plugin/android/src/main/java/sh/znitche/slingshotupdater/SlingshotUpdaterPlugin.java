@@ -1,4 +1,4 @@
-package sh.znitche.slingshot;
+package sh.znitche.SlingshotUpdater;
 
 import com.getcapacitor.JSObject;
 import com.getcapacitor.Plugin;
@@ -6,10 +6,10 @@ import com.getcapacitor.PluginCall;
 import com.getcapacitor.PluginMethod;
 import com.getcapacitor.annotation.CapacitorPlugin;
 
-@CapacitorPlugin(name = "Slingshot")
-public class SlingshotPlugin extends Plugin {
+@CapacitorPlugin(name = "SlingshotUpdater")
+public class SlingshotUpdaterPlugin extends Plugin {
 
-    private Slingshot implementation = new Slingshot();
+    private SlingshotUpdater implementation = new SlingshotUpdater();
 
     @PluginMethod
     public void echo(PluginCall call) {

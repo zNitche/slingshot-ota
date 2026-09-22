@@ -1,11 +1,11 @@
 import { useEffect } from "react";
 import classes from "./App.module.css";
-import { Slingshot } from "slingshot-ota";
+import { SlingshotUpdater } from "slingshot-updater";
 
 export default function App() {
     useEffect(() => {
         const c = setInterval(() => { 
-            Slingshot.echo({ value: "slingshot ota echo" });
+            SlingshotUpdater.echo({ value: "slingshot ota echo" });
         }, 1000)
 
         return () => clearInterval(c);
