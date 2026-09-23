@@ -1,4 +1,4 @@
-FROM node:24.11.1-slim
+FROM node:26.10.0-slim
 
 ARG USERNAME=slingshot_node
 ARG USER_UID=1111

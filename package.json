@@ -1,16 +1,20 @@
 {
-  "name": "slingshot-node-monorepo",
-  "version": "0.0.0",
-  "description": "POC of OTA updater for capacitor.js",
-  "homepage": "https://github.com/zNitche/slingshot-ota#readme",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/zNitche/slingshot-ota.git"
-  },
-  "license": "MIT",
-  "author": "zNitche",
-  "workspaces": [
-    "example_app",
-    "slingshot_updater_plugin"
-  ]
+    "name": "slingshot-node-monorepo",
+    "version": "0.0.0",
+    "description": "POC of OTA updater for capacitor.js",
+    "homepage": "https://github.com/zNitche/slingshot-ota#readme",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/zNitche/slingshot-ota.git"
+    },
+    "engines": {
+        "node": "^26.0.0",
+        "npm": ">11.19.0 <12.0.0"
+    },
+    "license": "MIT",
+    "author": "zNitche",
+    "workspaces": [
+        "example_app",
+        "slingshot_updater_plugin"
+    ]
 }
