@@ -14,7 +14,7 @@
         "@capacitor/ios": "8.5.2",
         "react": "19.2.8",
         "react-dom": "19.2.8",
-        "slingshot-updater": "*"
+        "slingshot-updater": "file:../slingshot_updater_plugin"
     },
     "devDependencies": {
         "@capacitor/cli": "8.5.2",
