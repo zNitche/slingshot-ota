@@ -10,7 +10,7 @@ let package = Package(
             targets: ["SlingshotUpdaterPlugin"])
     ],
     dependencies: [
-        .package(url: "https://github.com/ionic-team/capacitor-swift-pm.git", from: "8.0.0")
+        .package(url: "https://github.com/ionic-team/capacitor-swift-pm.git", exact: "8.5.2"),
     ],
     targets: [
         .target(

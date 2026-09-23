@@ -29,23 +29,20 @@
         "verify:android": "cd android && ./gradlew clean build test && cd ..",
         "verify:web": "npm run build",
         "build": "tsc && rollup -c rollup.config.mjs",
-        "watch": "tsc --watch",
-        "prepublishOnly": "npm run build"
+        "watch": "tsc --watch"
+    },
+    "peerDependencies": {
+        "@capacitor/core": "8.5.2"
     },
     "devDependencies": {
         "@capacitor/core": "8.5.2",
+        "@capacitor/cli": "8.5.2",
         "@capacitor/ios": "8.5.2",
         "@capacitor/android": "8.5.2",
         "eslint": "10.10.0",
         "prettier": "3.8.3",
         "rollup": "4.63.4",
         "typescript": "6.0.2"
-    },
-    "peerDependencies": {
-        "@capacitor/core": "8.5.2"
-    },
-    "eslintConfig": {
-        "extends": "@ionic/eslint-config/recommended"
     },
     "capacitor": {
         "ios": {
