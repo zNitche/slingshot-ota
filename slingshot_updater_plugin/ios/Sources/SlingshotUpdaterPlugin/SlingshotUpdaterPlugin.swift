@@ -10,34 +10,43 @@ public class SlingshotUpdaterPlugin: CAPPlugin, CAPBridgedPlugin {
     public let identifier = "SlingshotUpdaterPlugin"
     public let jsName = "SlingshotUpdater"
     
+    private let updaterTickInterval = 5.0;
+    
     private var timer: Timer? = nil
-
+    private var mainloopJob: DispatchWorkItem? = nil;
+    
     private let implementation = SlingshotUpdater()
-
-    public let pluginMethods: [CAPPluginMethod] = [
-//        CAPPluginMethod(name: "echo", returnType: CAPPluginReturnPromise)
-    ]
+    public let pluginMethods: [CAPPluginMethod] = []
     
     override public func load() {
-        timer?.invalidate();
+        self.updaterCleanup();
+        self.runUpdaterMainloop();
         
-        timer = Timer.scheduledTimer(withTimeInterval: 2.0, repeats: true) { [self] _ in
-            self.mainloop();
-        }
+        super.load();
     }
     
-    private func mainloop() {
-        print("counter");
-    }
-
-    deinit {
+    private func updaterCleanup() {
+        mainloopJob?.cancel();
+        mainloopJob = nil;
+        
         timer?.invalidate();
+        timer = nil;
+    }
+ 
+    private func runUpdaterMainloop() {
+        if (timer != nil || mainloopJob != nil) {
+            return;
+        }
+        
+        mainloopJob = DispatchWorkItem {
+            self.timer = Timer.scheduledTimer(withTimeInterval: self.updaterTickInterval, repeats: true) { [self] _ in
+                self.implementation.mainloop();
+            }}
+        
+        DispatchQueue.main.async(execute: self.mainloopJob!);
     }
     
-    // @objc func echo(_ call: CAPPluginCall) {
-    //     let value = call.getString("value") ?? ""
-    //     call.resolve([
-    //         "value": implementation.echo(value)
-    //     ])
-    // }
+    deinit {
+        self.updaterCleanup();
+    }
 }
