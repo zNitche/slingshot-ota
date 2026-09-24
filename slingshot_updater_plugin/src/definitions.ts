@@ -1,3 +1,3 @@
 export interface SlingshotUpdaterPlugin {
-//   echo(options: { value: string }): Promise<{ value: string }>;
+    get_revision_number(): Promise<{ value: string }>;
 }

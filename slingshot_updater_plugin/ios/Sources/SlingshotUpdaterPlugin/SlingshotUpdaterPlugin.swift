@@ -16,7 +16,15 @@ public class SlingshotUpdaterPlugin: CAPPlugin, CAPBridgedPlugin {
     private var mainloopJob: DispatchWorkItem? = nil;
     
     private let implementation = SlingshotUpdater()
-    public let pluginMethods: [CAPPluginMethod] = []
+    public let pluginMethods: [CAPPluginMethod] = [
+        CAPPluginMethod(name: "get_revision_number", returnType: CAPPluginReturnPromise)
+    ]
+
+    @objc func get_revision_number(_ call: CAPPluginCall) {
+        call.resolve([
+            "value": implementation.get_revision_number()
+        ])
+    }
     
     override public func load() {
         self.updaterCleanup();

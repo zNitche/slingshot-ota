@@ -1,18 +1,20 @@
+import { useEffect, useState } from "react";
 import classes from "./App.module.css";
-// import { SlingshotUpdater } from "slingshot-updater";
+import { SlingshotUpdater } from "slingshot-updater";
 
 export default function App() {
-    // useEffect(() => {
-    //     const c = setInterval(() => { 
-    //         SlingshotUpdater.echo({ value: "slingshot ota echo" });
-    //     }, 1000)
+    const [revision, setRevision] = useState<undefined | string>();
 
-    //     return () => clearInterval(c);
-    // })
+    useEffect(() => {
+        SlingshotUpdater.get_revision_number().then((r) => setRevision(r.value))
+    })
 
     return (
         <div className={classes.app}>
-            <div className={classes.content}>Slingshot Updater Test App</div>
+            <div className={classes.content}>
+                <span>Slingshot Updater Test App</span>
+                {revision !== undefined && <span>revision: {revision}</span>}
+            </div>
         </div>
     )
 }
