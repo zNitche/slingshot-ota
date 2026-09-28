@@ -10,16 +10,15 @@ public class SlingshotUpdaterPlugin: CAPPlugin, CAPBridgedPlugin {
     public let identifier = "SlingshotUpdaterPlugin"
     public let jsName = "SlingshotUpdater"
     
-    private let updaterTickInterval = 5.0;
+    private let updaterTickInterval = 5;
     
-    private var timer: Timer? = nil
-    private var mainloopJob: DispatchWorkItem? = nil;
+    private var mainloopPoolingTask: Task<Void, Never>? = nil;
     
     private let implementation = SlingshotUpdater()
     public let pluginMethods: [CAPPluginMethod] = [
         CAPPluginMethod(name: "get_revision_number", returnType: CAPPluginReturnPromise)
     ]
-
+    
     @objc func get_revision_number(_ call: CAPPluginCall) {
         call.resolve([
             "value": implementation.get_revision_number()
@@ -34,24 +33,26 @@ public class SlingshotUpdaterPlugin: CAPPlugin, CAPBridgedPlugin {
     }
     
     private func updaterCleanup() {
-        mainloopJob?.cancel();
-        mainloopJob = nil;
-        
-        timer?.invalidate();
-        timer = nil;
+        mainloopPoolingTask?.cancel();
+        mainloopPoolingTask = nil;
     }
- 
+    
     private func runUpdaterMainloop() {
-        if (timer != nil || mainloopJob != nil) {
+        if (mainloopPoolingTask != nil) {
             return;
         }
         
-        mainloopJob = DispatchWorkItem {
-            self.timer = Timer.scheduledTimer(withTimeInterval: self.updaterTickInterval, repeats: true) { [self] _ in
-                self.implementation.mainloop();
-            }}
-        
-        DispatchQueue.main.async(execute: self.mainloopJob!);
+        mainloopPoolingTask = Task {
+            while !Task.isCancelled {
+                do {
+                    try await implementation.mainloop()
+                } catch {
+                    print("Error:", error)
+                }
+                
+                try? await Task.sleep(nanoseconds: UInt64(updaterTickInterval * 1_000_000_000))
+            }
+        }
     }
     
     deinit {
