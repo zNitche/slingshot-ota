@@ -257,3 +257,5 @@ __marimo__/
 .streamlit/secrets.toml
 
 s_venv/
+
+certs/
