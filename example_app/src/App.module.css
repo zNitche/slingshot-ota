@@ -11,4 +11,9 @@
     display: flex;
     flex-direction: column;
     gap: 8px;
+    overflow: hidden;
+    word-break: break-all;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
 }
