@@ -1,8 +1,9 @@
-from slingshot_be import create_app
-from config import AppConfig
 from load_dotenv import load_dotenv
 
 load_dotenv(".env")
+
+from slingshot_be import create_app
+from config import AppConfig
 
 app = create_app(config_class=AppConfig)
 
