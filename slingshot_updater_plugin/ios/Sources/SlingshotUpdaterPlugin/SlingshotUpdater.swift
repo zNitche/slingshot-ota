@@ -19,25 +19,25 @@ import Foundation
     }
     
     private func fetchNewRevision(metadata: RevisionMetadata) async throws {
-        print("fetch new");
-        
         let releaseZipDownloadUrl = URL(string: metadata.releaseUrl)!;
         let releaseSignatureDownloadUrl = URL(string: metadata.sigUrl)!;
+                
+        let targetTmpDir = try getRevisionTmpDir(removeOnGet: true)
+        let zipDestinationDir = targetTmpDir.appending(path: "release.zip");
+        let sigDestinationDir = targetTmpDir.appending(path: "release.zip.sig");
         
-        let targetDir = try FileManager.default.url(
-                for: .applicationSupportDirectory,
-                in: .userDomainMask,
-                appropriateFor: nil,
-                create: true
-            )
+        let (releaseZipURL, _) = try await URLSession.shared.download(from: releaseZipDownloadUrl)
         
-        let destinationDir = targetDir.appendingPathComponent("release.zip");
-        
-        let (temporaryURL, response) = try await URLSession.shared.download(from: releaseZipDownloadUrl)
+        let (releaseSigURL, _) = try await URLSession.shared.download(from: releaseSignatureDownloadUrl)
         
         try FileManager.default.moveItem(
-                at: temporaryURL,
-                to: destinationDir
+                at: releaseZipURL,
+                to: zipDestinationDir
+            )
+        
+        try FileManager.default.moveItem(
+                at: releaseSigURL,
+                to: sigDestinationDir
             )
                 
         try writeRevisionNumberToFile(num: metadata.sha256sum);
