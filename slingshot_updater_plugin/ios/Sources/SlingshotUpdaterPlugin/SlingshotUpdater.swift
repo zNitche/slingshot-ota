@@ -29,22 +29,24 @@ import Foundation
         let (releaseSigURL, _) = try await URLSession.shared.download(from: releaseSignatureDownloadUrl)
         
         try FileManager.default.moveItem(
-                at: releaseZipURL,
-                to: revisionFilesURLs.zip
-            )
+            at: releaseZipURL,
+            to: revisionFilesURLs.zip
+        )
         
         try FileManager.default.moveItem(
-                at: releaseSigURL,
-                to: revisionFilesURLs.signature
-            )
+            at: releaseSigURL,
+            to: revisionFilesURLs.signature
+        )
     }
     
-    private func validateNewRevision() throws -> Bool {
+    private func validateNewRevision(metadata: RevisionMetadata) throws -> Bool {
         let revisionFilesURLs = try getRevisionFilesURLs();
         
         let signatureValidationResult = try validateFile(fileURL: revisionFilesURLs.zip, signatureURL: revisionFilesURLs.signature)
         
-        return signatureValidationResult
+        let hashValidationResult = try validateFileSHA256(fileURL: revisionFilesURLs.zip, originHash: metadata.sha256sum)
+
+        return Bool(hashValidationResult && hashValidationResult)
     }
     
     private func getRevisionMetadata() async throws -> RevisionMetadata? {
@@ -55,18 +57,18 @@ import Foundation
         let resJson = try JSONSerialization.jsonObject(with: resData) as? [String: Any];
         
         let new_revision_exists = resJson?["exists"] as? Bool;
-                        
+        
         if (!(new_revision_exists ?? false)) {
             return nil;
         }
-
+        
         let sha256sum = resJson?["sha256sum"] as? String;
         let releaseUrl = resJson?["release_url"] as? String;
         let sigUrl = resJson?["sig_url"] as? String;
         
         let metadata = RevisionMetadata(sha256sum: sha256sum!,
-                                 releaseUrl: releaseUrl!,
-                                 sigUrl: sigUrl!);
+                                        releaseUrl: releaseUrl!,
+                                        sigUrl: sigUrl!);
         
         return metadata;
     }
@@ -83,12 +85,14 @@ import Foundation
         }
         
         if (try checkIfNewRevisionShouldBeFetched(metadata: metadata!)) {
+            try removeRevisionTmpDir();
+            
             try await fetchNewRevision(metadata: metadata!);
             
-            if (try validateNewRevision() == false) {
+            if (try validateNewRevision(metadata: metadata!) == false) {
                 return;
             }
-
+            
             try writeRevisionNumberToFile(num: metadata!.sha256sum);
         }
     }

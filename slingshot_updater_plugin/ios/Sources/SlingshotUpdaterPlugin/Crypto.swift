@@ -35,7 +35,6 @@ func validateFileSignature(
     publicKey: SecKey
 ) throws -> Bool {
     let fileData = try Data(contentsOf: fileURL)
-    // let sha256sum = Data(SHA256.hash(data: fileData))
     
     let isAlgoSupported = SecKeyIsAlgorithmSupported(
         publicKey,
@@ -53,4 +52,15 @@ func validateFileSignature(
         signature as CFData,
         nil
     )
+}
+
+func validateFileSHA256(fileURL: URL, originHash: String) throws -> Bool {
+    let fileData = try Data(contentsOf: fileURL)
+    let sha256sum = SHA256.hash(data: fileData)
+    
+    let localFileHashString = sha256sum
+        .map { String(format: "%02x", $0) }
+        .joined()
+    
+    return localFileHashString.caseInsensitiveCompare(originHash.trimmingCharacters(in: .whitespacesAndNewlines)) == .orderedSame
 }
