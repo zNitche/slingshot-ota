@@ -39,8 +39,16 @@ import Foundation
                 at: releaseSigURL,
                 to: sigDestinationDir
             )
-                
-        try writeRevisionNumberToFile(num: metadata.sha256sum);
+    }
+    
+    private func validateNewRevision() throws -> Bool {
+        let targetTmpDir = try getRevisionTmpDir(removeOnGet: false)
+        let zipDestinationDir = targetTmpDir.appending(path: "release.zip");
+        let sigDestinationDir = targetTmpDir.appending(path: "release.zip.sig");
+        
+        let signatureValidationResult = try validateFile(fileURL: zipDestinationDir, signatureURL: sigDestinationDir)
+        
+        return signatureValidationResult
     }
     
     private func getRevisionMetadata() async throws -> RevisionMetadata? {
@@ -80,6 +88,12 @@ import Foundation
         
         if (try checkIfNewRevisionShouldBeFetched(metadata: metadata!)) {
             try await fetchNewRevision(metadata: metadata!);
+            
+            if (try validateNewRevision() == false) {
+                return;
+            }
+
+            try writeRevisionNumberToFile(num: metadata!.sha256sum);
         }
     }
 }
