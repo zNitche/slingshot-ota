@@ -2,12 +2,20 @@ import Foundation
 
 
 @objc public class SlingshotUpdater: NSObject {
-    private let metadataEndpointUrl = URL(string: "http://127.0.0.1:8080/api/v1/current-revision");
+    private var backendUrlBase: URL? = nil
+    
+    override init(){
+        super.init();
+    }
 
     @objc public func get_revision_number() -> String {
         let currentRevision = try? readRevisionNumberFromFile() ?? "";
         
         return currentRevision ?? "";
+    }
+    
+    func configure(pluignConfig: SlingshotConfig) {
+        backendUrlBase = URL(string: pluignConfig.url)
     }
     
     private func fetchNewRevision(metadata: RevisionMetadata) async throws {
@@ -35,8 +43,10 @@ import Foundation
         try writeRevisionNumberToFile(num: metadata.sha256sum);
     }
     
-    private func processRevision() async throws -> RevisionMetadata? {
-        let (resData, response) = try await URLSession.shared.data(from: metadataEndpointUrl!);
+    private func getRevisionMetadata() async throws -> RevisionMetadata? {
+        let targetUrl = getMetadataUrl(baseUrl: self.backendUrlBase!);
+        
+        let (resData, response) = try await URLSession.shared.data(from: targetUrl);
         
         let resJson = try JSONSerialization.jsonObject(with: resData) as? [String: Any];
         
@@ -57,8 +67,12 @@ import Foundation
         return metadata;
     }
     
-    public func mainloop() async throws {
-        let metadata = try await self.processRevision();
+    func mainloop() async throws {
+        if (backendUrlBase?.path() == nil) {
+            return
+        }
+        
+        let metadata = try await self.getRevisionMetadata();
         
         if (metadata == nil) {
             return;
