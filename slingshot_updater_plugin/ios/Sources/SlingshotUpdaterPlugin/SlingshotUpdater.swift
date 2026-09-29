@@ -7,7 +7,7 @@ import Foundation
     override init(){
         super.init();
     }
-
+    
     @objc public func get_revision_number() -> String {
         let currentRevision = try? readRevisionNumberFromFile() ?? "";
         
@@ -21,7 +21,7 @@ import Foundation
     private func fetchNewRevision(metadata: RevisionMetadata) async throws {
         let releaseZipDownloadUrl = URL(string: metadata.releaseUrl)!;
         let releaseSignatureDownloadUrl = URL(string: metadata.sigUrl)!;
-                
+        
         let revisionFilesURLs = try getRevisionFilesURLs();
         
         let (releaseZipURL, _) = try await URLSession.shared.download(from: releaseZipDownloadUrl)
