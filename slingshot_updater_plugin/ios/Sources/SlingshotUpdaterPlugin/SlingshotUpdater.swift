@@ -22,9 +22,7 @@ import Foundation
         let releaseZipDownloadUrl = URL(string: metadata.releaseUrl)!;
         let releaseSignatureDownloadUrl = URL(string: metadata.sigUrl)!;
                 
-        let targetTmpDir = try getRevisionTmpDir(removeOnGet: true)
-        let zipDestinationDir = targetTmpDir.appending(path: "release.zip");
-        let sigDestinationDir = targetTmpDir.appending(path: "release.zip.sig");
+        let revisionFilesURLs = try getRevisionFilesURLs();
         
         let (releaseZipURL, _) = try await URLSession.shared.download(from: releaseZipDownloadUrl)
         
@@ -32,21 +30,19 @@ import Foundation
         
         try FileManager.default.moveItem(
                 at: releaseZipURL,
-                to: zipDestinationDir
+                to: revisionFilesURLs.zip
             )
         
         try FileManager.default.moveItem(
                 at: releaseSigURL,
-                to: sigDestinationDir
+                to: revisionFilesURLs.signature
             )
     }
     
     private func validateNewRevision() throws -> Bool {
-        let targetTmpDir = try getRevisionTmpDir(removeOnGet: false)
-        let zipDestinationDir = targetTmpDir.appending(path: "release.zip");
-        let sigDestinationDir = targetTmpDir.appending(path: "release.zip.sig");
+        let revisionFilesURLs = try getRevisionFilesURLs();
         
-        let signatureValidationResult = try validateFile(fileURL: zipDestinationDir, signatureURL: sigDestinationDir)
+        let signatureValidationResult = try validateFile(fileURL: revisionFilesURLs.zip, signatureURL: revisionFilesURLs.signature)
         
         return signatureValidationResult
     }

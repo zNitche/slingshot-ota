@@ -52,11 +52,11 @@ func loadPluginConfig() throws -> SlingshotConfig {
 
 func getRevisionTmpDir(removeOnGet: Bool) throws -> URL {
     var targetTmpDir = try FileManager.default.url(
-            for: .applicationSupportDirectory,
-            in: .userDomainMask,
-            appropriateFor: nil,
-            create: true
-        )
+        for: .applicationSupportDirectory,
+        in: .userDomainMask,
+        appropriateFor: nil,
+        create: true
+    )
     
     targetTmpDir = targetTmpDir.appending(path: "tmp", directoryHint: .isDirectory)
     
@@ -70,4 +70,11 @@ func getRevisionTmpDir(removeOnGet: Bool) throws -> URL {
     )
     
     return targetTmpDir
+}
+
+func getRevisionFilesURLs() throws -> RevisionFilesURLs  {
+    let targetTmpDir = try getRevisionTmpDir(removeOnGet: false)
+    
+    return RevisionFilesURLs(zip: targetTmpDir.appending(path: "release.zip"),
+                             signature: targetTmpDir.appending(path: "release.zip.sig"))
 }
