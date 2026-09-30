@@ -13,6 +13,7 @@ export default defineConfig({
         cssCodeSplit: false,
         target: "es2023",
         sourcemap: false,
+        emptyOutDir: true,
     },
     resolve: {
         alias: {
