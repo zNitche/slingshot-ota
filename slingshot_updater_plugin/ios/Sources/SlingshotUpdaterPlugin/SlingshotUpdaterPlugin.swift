@@ -12,7 +12,7 @@ public class SlingshotUpdaterPlugin: CAPPlugin, CAPBridgedPlugin {
     public let jsName = "SlingshotUpdater"
     
     private var isInBackground = false;
-
+    
     private var pluignConfig: SlingshotConfig? = nil;
     
     private var mainloopPoolingTask: Task<Void, Never>? = nil;
@@ -30,13 +30,13 @@ public class SlingshotUpdaterPlugin: CAPPlugin, CAPBridgedPlugin {
     
     override public func load() {
         self.setupAppStateNotifications();
-            
+        
         self.pluignConfig = try? loadPluginConfig()
         self.implementation.configure(pluignConfig: pluignConfig!)
         
         self.updaterCleanup();
         self.runUpdaterMainloop();
-                
+        
         super.load();
     }
     
@@ -49,7 +49,7 @@ public class SlingshotUpdaterPlugin: CAPPlugin, CAPBridgedPlugin {
             self.isInBackground = false
             self.runUpdaterMainloop()
         }
-
+        
         NotificationCenter.default.addObserver(
             forName: UIApplication.didEnterBackgroundNotification,
             object: nil,
@@ -78,11 +78,22 @@ public class SlingshotUpdaterPlugin: CAPPlugin, CAPBridgedPlugin {
             while !Task.isCancelled {
                 do {
                     try await implementation.mainloop()
+                } catch is CancellationError {
+                    debugPrint("[SHT] mainloopPoolingTask cancelled")
+                    break
                 } catch {
-                    print("Error:", error)
+                    debugPrint("[SHT][ERROR] mainloopPoolingTask:", error)
                 }
                 
-                try? await Task.sleep(nanoseconds: (pluignConfig?.updaterTickInterval ?? 300) * 1_000_000_000)
+                if (Task.isCancelled) {
+                    break
+                }
+                
+                do {
+                    try await Task.sleep(for: .seconds(pluignConfig?.updaterTickInterval ?? 300))
+                } catch {
+                    break
+                }
             }
         }
     }

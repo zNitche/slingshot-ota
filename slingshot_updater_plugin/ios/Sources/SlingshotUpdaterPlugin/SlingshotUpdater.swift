@@ -25,7 +25,6 @@ import Foundation
         let revisionFilesURLs = try getRevisionFilesURLs();
         
         let (releaseZipURL, _) = try await URLSession.shared.download(from: releaseZipDownloadUrl)
-        
         let (releaseSigURL, _) = try await URLSession.shared.download(from: releaseSignatureDownloadUrl)
         
         try FileManager.default.moveItem(
@@ -43,9 +42,8 @@ import Foundation
         let revisionFilesURLs = try getRevisionFilesURLs();
         
         let signatureValidationResult = try validateFile(fileURL: revisionFilesURLs.zip, signatureURL: revisionFilesURLs.signature)
-        
         let hashValidationResult = try validateFileSHA256(fileURL: revisionFilesURLs.zip, originHash: metadata.sha256sum)
-
+        
         return Bool(hashValidationResult && hashValidationResult)
     }
     
@@ -53,9 +51,8 @@ import Foundation
         let targetUrl = getMetadataUrl(baseUrl: self.backendUrlBase!);
         
         let (resData, response) = try await URLSession.shared.data(from: targetUrl);
-        
         let resJson = try JSONSerialization.jsonObject(with: resData) as? [String: Any];
-        
+
         let new_revision_exists = resJson?["exists"] as? Bool;
         
         if (!(new_revision_exists ?? false)) {
@@ -74,9 +71,13 @@ import Foundation
     }
     
     func mainloop() async throws {
+        debugPrint("[SHT] iteration start")
+
         if (backendUrlBase?.path() == nil) {
             return
         }
+        
+        debugPrint("[SHT] getting revision metadata")
         
         let metadata = try await self.getRevisionMetadata();
         
@@ -84,15 +85,25 @@ import Foundation
             return;
         }
         
+        debugPrint("[SHT] got revison metadata")
+        
+        try Task.checkCancellation()
+        
         if (try checkIfNewRevisionShouldBeFetched(metadata: metadata!)) {
-            try removeRevisionTmpDir();
+            debugPrint("[SHT] fetching new revision")
             
+            try removeRevisionTmpDir();
             try await fetchNewRevision(metadata: metadata!);
             
             if (try validateNewRevision(metadata: metadata!) == false) {
+                debugPrint("[SHT] revision rsa validation has failed")
                 return;
             }
             
+            debugPrint("[SHT] processing revision files")
+            
+            try Task.checkCancellation()
+
             try writeRevisionNumberToFile(num: metadata!.sha256sum);
         }
     }
