@@ -17,3 +17,8 @@ struct RevisionFilesURLs {
     let zip: URL
     let signature: URL
 }
+
+enum RevisionDirectoryType: String {
+    case tmp = "tmp"
+    case current = "current"
+}

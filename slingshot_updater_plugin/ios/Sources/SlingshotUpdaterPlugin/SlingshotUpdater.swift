@@ -22,7 +22,7 @@ import Foundation
         let releaseZipDownloadUrl = URL(string: metadata.releaseUrl)!;
         let releaseSignatureDownloadUrl = URL(string: metadata.sigUrl)!;
         
-        let revisionFilesURLs = try getRevisionFilesURLs();
+        let revisionFilesURLs = try getRevisionTmpFilesURLs();
         
         let (releaseZipURL, _) = try await URLSession.shared.download(from: releaseZipDownloadUrl)
         let (releaseSigURL, _) = try await URLSession.shared.download(from: releaseSignatureDownloadUrl)
@@ -39,12 +39,19 @@ import Foundation
     }
     
     private func validateNewRevision(metadata: RevisionMetadata) throws -> Bool {
-        let revisionFilesURLs = try getRevisionFilesURLs();
+        let revisionFilesURLs = try getRevisionTmpFilesURLs();
         
         let signatureValidationResult = try validateFile(fileURL: revisionFilesURLs.zip, signatureURL: revisionFilesURLs.signature)
         let hashValidationResult = try validateFileSHA256(fileURL: revisionFilesURLs.zip, originHash: metadata.sha256sum)
         
         return Bool(hashValidationResult && hashValidationResult)
+    }
+    
+    private func extractReleaseZip() throws {
+        let revisionFilesURLs = try getRevisionTmpFilesURLs();
+        
+        let fileManager = FileManager()
+        try fileManager.unzipItem(at: revisionFilesURLs.zip, to: revisionFilesURLs.zip)
     }
     
     private func getRevisionMetadata() async throws -> RevisionMetadata? {
@@ -92,7 +99,7 @@ import Foundation
         if (try checkIfNewRevisionShouldBeFetched(metadata: metadata!)) {
             debugPrint("[SHT] fetching new revision")
             
-            try removeRevisionTmpDir();
+            try removeRevisionDir(type: .tmp);
             try await fetchNewRevision(metadata: metadata!);
             
             if (try validateNewRevision(metadata: metadata!) == false) {
