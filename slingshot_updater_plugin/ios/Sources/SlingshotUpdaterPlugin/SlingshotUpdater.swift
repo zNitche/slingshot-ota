@@ -1,4 +1,5 @@
 import Foundation
+import ZIPFoundation
 
 
 @objc public class SlingshotUpdater: NSObject {
@@ -48,10 +49,11 @@ import Foundation
     }
     
     private func extractReleaseZip() throws {
-        let revisionFilesURLs = try getRevisionTmpFilesURLs();
+        let revisionFilesURLs = try getRevisionTmpFilesURLs()
+        let targetRevisionDirURL = try getRevisionDir(type: .current)
         
         let fileManager = FileManager()
-        try fileManager.unzipItem(at: revisionFilesURLs.zip, to: revisionFilesURLs.zip)
+        try fileManager.unzipItem(at: revisionFilesURLs.zip, to: targetRevisionDirURL)
     }
     
     private func getRevisionMetadata() async throws -> RevisionMetadata? {
@@ -77,19 +79,19 @@ import Foundation
         return metadata;
     }
     
-    func mainloop() async throws {
-        debugPrint("[SHT] iteration start")
+    func check_for_update() async throws -> Bool {
+        debugPrint("[SHT] checking for new revision")
 
         if (backendUrlBase?.path() == nil) {
-            return
+            return false
         }
         
         debugPrint("[SHT] getting revision metadata")
         
-        let metadata = try await self.getRevisionMetadata();
+        let metadata = try await self.getRevisionMetadata()
         
         if (metadata == nil) {
-            return;
+            return false
         }
         
         debugPrint("[SHT] got revison metadata")
@@ -99,19 +101,28 @@ import Foundation
         if (try checkIfNewRevisionShouldBeFetched(metadata: metadata!)) {
             debugPrint("[SHT] fetching new revision")
             
-            try removeRevisionDir(type: .tmp);
-            try await fetchNewRevision(metadata: metadata!);
+            try removeRevisionDir(type: .tmp)
+            try await fetchNewRevision(metadata: metadata!)
             
             if (try validateNewRevision(metadata: metadata!) == false) {
                 debugPrint("[SHT] revision rsa validation has failed")
-                return;
+                return false
             }
             
             debugPrint("[SHT] processing revision files")
             
+            try removeRevisionDir(type: .current)
+            try extractReleaseZip()
+            try removeRevisionDir(type: .tmp)
+            
+            debugPrint("[SHT] saved new revision, removed tmp dir")
+            
             try Task.checkCancellation()
-
-            try writeRevisionNumberToFile(num: metadata!.sha256sum);
+            try writeRevisionNumberToFile(num: metadata!.sha256sum)
+            
+            return true
         }
+        
+        return false
     }
 }
