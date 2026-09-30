@@ -29,6 +29,8 @@ public class SlingshotUpdaterPlugin: CAPPlugin, CAPBridgedPlugin {
     }
     
     override public func load() {
+        super.load();
+
         self.setupAppStateNotifications();
         
         self.pluignConfig = try? loadPluginConfig()
@@ -36,8 +38,6 @@ public class SlingshotUpdaterPlugin: CAPPlugin, CAPBridgedPlugin {
         
         self.updaterCleanup();
         self.runUpdaterMainloop();
-        
-        super.load();
     }
     
     private func setupAppStateNotifications() {
@@ -77,7 +77,12 @@ public class SlingshotUpdaterPlugin: CAPPlugin, CAPBridgedPlugin {
         mainloopPoolingTask = Task {
             while !Task.isCancelled {
                 do {
-                    try await implementation.mainloop()
+                    let got_new_update = try await implementation.check_for_update()
+                    
+                    if (got_new_update) {
+                        debugPrint("[SHT] setting up new revision/release")
+                        try self.set_base_server_path_for_revision()
+                    }
                 } catch is CancellationError {
                     debugPrint("[SHT] mainloopPoolingTask cancelled")
                     break
@@ -98,7 +103,21 @@ public class SlingshotUpdaterPlugin: CAPPlugin, CAPBridgedPlugin {
         }
     }
     
-    deinit {
-        self.updaterCleanup();
+    private func set_base_server_path_for_revision() throws {
+        if (!(try doesRevisionNumberFileExist())) {
+            return
+        }
+        
+        let revisionDirURL = try getRevisionDir(type: .current);
+        
+        let indexPathURL = revisionDirURL.appending(path: "index.html")
+        
+        guard FileManager.default.fileExists(atPath: indexPathURL.path()) else {
+            debugPrint("index.html doesn't exist at ", indexPathURL.path())
+            return
+        }
+        
+        self.bridge?.setServerBasePath(revisionDirURL.path())
+        UserDefaults.standard.set(revisionDirURL.path(), forKey: "slingshot_revision_path")
     }
 }
