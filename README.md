@@ -14,7 +14,7 @@ openssl req -x509 -sha256 -out cert.crt -key priv_key.key -days 365
 
 ```
 npm run buid
-zip -r release.zip dist
+(cd dist && zip -r ../release.zip .)
 ```
 
 ```
