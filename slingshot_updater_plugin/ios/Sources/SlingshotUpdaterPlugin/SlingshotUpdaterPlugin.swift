@@ -81,7 +81,7 @@ public class SlingshotUpdaterPlugin: CAPPlugin, CAPBridgedPlugin {
                     
                     if (got_new_update) {
                         debugPrint("[SHT] setting up new revision/release")
-                        try self.set_base_server_path_for_revision()
+                        try self.set_slingshot_revision()
                     }
                 } catch is CancellationError {
                     debugPrint("[SHT] mainloopPoolingTask cancelled")
@@ -103,21 +103,20 @@ public class SlingshotUpdaterPlugin: CAPPlugin, CAPBridgedPlugin {
         }
     }
     
-    private func set_base_server_path_for_revision() throws {
+    private func set_slingshot_revision() throws {
         if (!(try doesRevisionNumberFileExist())) {
             return
         }
         
-        let revisionDirURL = try getRevisionDir(type: .current);
+        let revisionNumber = try readRevisionNumberFromFile()
+        try checkRevisionDirectory()
         
-        let indexPathURL = revisionDirURL.appending(path: "index.html")
+        UserDefaults.standard.set(revisionNumber, forKey: "slingshot_revision")
         
-        guard FileManager.default.fileExists(atPath: indexPathURL.path()) else {
-            debugPrint("index.html doesn't exist at ", indexPathURL.path())
-            return
+        if (pluignConfig?.reloadWebviewOnNewRelease ?? false) {
+            DispatchQueue.main.async {
+                self.bridge?.webView?.reload()
+            }
         }
-        
-        self.bridge?.setServerBasePath(revisionDirURL.path())
-        UserDefaults.standard.set(revisionDirURL.path(), forKey: "slingshot_revision_path")
     }
 }

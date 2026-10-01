@@ -79,3 +79,15 @@ func getRevisionTmpFilesURLs() throws -> RevisionFilesURLs  {
     return RevisionFilesURLs(zip: targetTmpDir.appending(path: "release.zip"),
                              signature: targetTmpDir.appending(path: "release.zip.sig"))
 }
+
+func checkRevisionDirectory() throws -> Bool  {
+    let revisionDirURL = try getRevisionDir(type: .current)
+    
+    let indexPathURL = revisionDirURL.appending(path: "index.html")
+    
+    guard FileManager.default.fileExists(atPath: indexPathURL.path(percentEncoded: false)) else {
+        throw NSError(domain: "index.html doesn't exist at " + indexPathURL.path(percentEncoded: false), code: 21)
+    }
+    
+    return true
+}
