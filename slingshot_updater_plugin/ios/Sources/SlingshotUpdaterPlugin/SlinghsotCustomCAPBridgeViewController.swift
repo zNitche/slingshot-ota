@@ -4,14 +4,15 @@ public class SlingshotCustomCAPBridgeViewController: CAPBridgeViewController {
     override public func instanceDescriptor() -> InstanceDescriptor {
         let descriptor = super.instanceDescriptor()
         
-        let revision_path = UserDefaults.standard.string(forKey: "slingshot_revision_path")
+        let revisionCode = UserDefaults.standard.string(forKey: "slingshot_revision")
+        let revisionExists = (try? checkRevisionDirectory()) ?? false
         
-        if (revision_path != nil) {
-            let url = URL(string: revision_path!)
+        if (revisionExists && revisionCode != nil) {
+            let revisionDirURL = try? getRevisionDir(type: .current)
             
-            if (url != nil) {
-                FileManager.default.fileExists(atPath: url!.path())
-                descriptor.appLocation = url!
+            if (revisionDirURL?.path() != nil) {
+                FileManager.default.fileExists(atPath: revisionDirURL!.path(percentEncoded: false))
+                descriptor.appLocation = revisionDirURL!
             }
         }
         
