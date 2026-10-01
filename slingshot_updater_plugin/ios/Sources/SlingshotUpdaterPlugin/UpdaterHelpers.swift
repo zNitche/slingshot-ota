@@ -2,7 +2,7 @@ import Foundation
 
 
 func doesRevisionNumberFileExist() -> Bool {
-    guard let url = try? getFilePath(pathItems: ["revision.txt"]) else {
+    guard let url = try? getSlingshotFilePath(pathItems: ["revision.txt"]) else {
         return false
     }
     
@@ -10,12 +10,12 @@ func doesRevisionNumberFileExist() -> Bool {
 }
 
 func writeRevisionNumberToFile(num: String) throws {
-    let url = try? getFilePath(pathItems: ["revision.txt"])
+    let url = try? getSlingshotFilePath(pathItems: ["revision.txt"])
     try writeToFile(filePath: url!, content: num)
 }
 
 func readRevisionNumberFromFile() throws -> String {
-    let url = try? getFilePath(pathItems: ["revision.txt"])
+    let url = try? getSlingshotFilePath(pathItems: ["revision.txt"])
     return try readFromFile(filePath: url!)
 }
 
@@ -33,7 +33,7 @@ func getAppVersion() -> String {
     return Bundle.main.infoDictionary?["CFBundleShortVersionString"] as! String ?? ""
 }
 
-func getMetadataUrl(baseUrl: URL) -> URL {
+func getMetadataApiURL(baseUrl: URL) -> URL {
     let appVersion = getAppVersion()
     var url = baseUrl
     
@@ -51,15 +51,8 @@ func loadPluginConfig() throws -> SlingshotConfig {
 }
 
 func getRevisionDir(type: RevisionDirectoryType) throws -> URL {
-    var dir = try FileManager.default.url(
-        for: .applicationSupportDirectory,
-        in: .userDomainMask,
-        appropriateFor: nil,
-        create: true
-    )
-    
-    dir = dir.appending(path: type.rawValue, directoryHint: .isDirectory)
-    
+    var dir = try getSlingshotFilePath(pathItems: [type.rawValue])
+
     try? FileManager.default.createDirectory(
         at: dir,
         withIntermediateDirectories: true

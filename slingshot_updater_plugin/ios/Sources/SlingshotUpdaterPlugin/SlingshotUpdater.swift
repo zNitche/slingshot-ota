@@ -57,7 +57,7 @@ import ZIPFoundation
     }
     
     private func getRevisionMetadata() async throws -> RevisionMetadata? {
-        let targetUrl = getMetadataUrl(baseUrl: self.backendUrlBase!);
+        let targetUrl = getMetadataApiURL(baseUrl: self.backendUrlBase!);
         
         let (resData, response) = try await URLSession.shared.data(from: targetUrl);
         let resJson = try JSONSerialization.jsonObject(with: resData) as? [String: Any];

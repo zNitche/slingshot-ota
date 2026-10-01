@@ -1,7 +1,7 @@
 import Foundation
 
 
-func getFilePath(pathItems: [String]) throws -> URL {
+func getSlingshotFilePath(pathItems: [String]) throws -> URL {
     var url = try FileManager.default.url(
         for: .applicationSupportDirectory,
         in: .userDomainMask,
@@ -9,11 +9,19 @@ func getFilePath(pathItems: [String]) throws -> URL {
         create: true,
     )
     
+    url = url.appending(path: "slingshot", directoryHint: .isDirectory)
+    
+    try? FileManager.default.createDirectory(
+        at: url,
+        withIntermediateDirectories: true
+    )
+    
+
     for item in pathItems {
-        url = url.appending(path: item, directoryHint: .checkFileSystem);
+        url = url.appending(path: item, directoryHint: .checkFileSystem)
     }
     
-    return url;
+    return url
 }
 
 func writeToFile(filePath: URL, content: String) throws {
