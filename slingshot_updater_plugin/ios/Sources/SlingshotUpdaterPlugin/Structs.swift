@@ -4,6 +4,7 @@ import Foundation
 struct SlingshotConfig: Decodable {
     let url: String
     let updaterTickInterval: UInt64
+    let reloadWebviewOnNewRelease: Bool
 }
 
 
