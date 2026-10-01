@@ -23,3 +23,8 @@ enum RevisionDirectoryType: String {
     case tmp = "tmp"
     case current = "current"
 }
+
+struct RevisionDetails: Decodable, Encodable {
+    var revisionNumber: String
+    var appVersion: String
+}

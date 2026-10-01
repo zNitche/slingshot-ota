@@ -9,10 +9,10 @@ import ZIPFoundation
         super.init();
     }
     
-    @objc public func get_revision_number() -> String {
-        let currentRevision = try? readRevisionNumberFromFile() ?? "";
+    @objc public func get_revision_number() throws -> String {
+        let currentRevision = try readRevisionNumberFromFile();
         
-        return currentRevision ?? "";
+        return currentRevision.revisionNumber;
     }
     
     func configure(pluignConfig: SlingshotConfig) {
@@ -57,7 +57,7 @@ import ZIPFoundation
     }
     
     private func getRevisionMetadata() async throws -> RevisionMetadata? {
-        let targetUrl = getMetadataApiURL(baseUrl: self.backendUrlBase!);
+        let targetUrl = try getMetadataApiURL(baseUrl: self.backendUrlBase!);
         
         let (resData, response) = try await URLSession.shared.data(from: targetUrl);
         let resJson = try JSONSerialization.jsonObject(with: resData) as? [String: Any];

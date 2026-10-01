@@ -2,7 +2,7 @@ import Foundation
 
 
 func doesRevisionNumberFileExist() -> Bool {
-    guard let url = try? getSlingshotFilePath(pathItems: ["revision.txt"]) else {
+    guard let url = try? getSlingshotFilePath(pathItems: ["revision.json"]) else {
         return false
     }
     
@@ -10,31 +10,39 @@ func doesRevisionNumberFileExist() -> Bool {
 }
 
 func writeRevisionNumberToFile(num: String) throws {
-    let url = try? getSlingshotFilePath(pathItems: ["revision.txt"])
-    try writeToFile(filePath: url!, content: num)
+    let url = try? getSlingshotFilePath(pathItems: ["revision.json"])
+    
+    let appVersion = try getAppVersion()
+    
+    let data = RevisionDetails(revisionNumber: num, appVersion: appVersion)
+    let dataJson = try JSONEncoder().encode(data)
+    
+    try dataJson.write(to: url!)
 }
 
-func readRevisionNumberFromFile() throws -> String {
-    let url = try? getSlingshotFilePath(pathItems: ["revision.txt"])
-    return try readFromFile(filePath: url!)
+func readRevisionNumberFromFile() throws -> RevisionDetails {
+    let url = try? getSlingshotFilePath(pathItems: ["revision.json"])
+    
+    let data = try Data(contentsOf: url!)
+    return try JSONDecoder().decode(RevisionDetails.self, from: data)
 }
 
 func checkIfNewRevisionShouldBeFetched(metadata: RevisionMetadata) throws -> Bool {
     if (doesRevisionNumberFileExist()) {
         let currentRevision = try readRevisionNumberFromFile();
         
-        return currentRevision != metadata.sha256sum;
+        return currentRevision.revisionNumber != metadata.sha256sum;
     }
     
     return true;
 }
 
-func getAppVersion() -> String {
-    return Bundle.main.infoDictionary?["CFBundleShortVersionString"] as! String ?? ""
+func getAppVersion() throws -> String {
+    return Bundle.main.infoDictionary?["CFBundleShortVersionString"] as! String
 }
 
-func getMetadataApiURL(baseUrl: URL) -> URL {
-    let appVersion = getAppVersion()
+func getMetadataApiURL(baseUrl: URL) throws -> URL {
+    let appVersion = try getAppVersion()
     var url = baseUrl
     
     url = url.appending(path: appVersion)

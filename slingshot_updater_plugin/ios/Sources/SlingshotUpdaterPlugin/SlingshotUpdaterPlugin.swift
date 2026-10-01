@@ -24,7 +24,7 @@ public class SlingshotUpdaterPlugin: CAPPlugin, CAPBridgedPlugin {
     
     @objc func get_revision_number(_ call: CAPPluginCall) {
         call.resolve([
-            "value": implementation.get_revision_number()
+            "value": try? implementation.get_revision_number() ?? ""
         ])
     }
     
@@ -111,7 +111,7 @@ public class SlingshotUpdaterPlugin: CAPPlugin, CAPBridgedPlugin {
         let revisionNumber = try readRevisionNumberFromFile()
         try checkRevisionDirectory()
         
-        UserDefaults.standard.set(revisionNumber, forKey: "slingshot_revision")
+        UserDefaults.standard.set(revisionNumber.revisionNumber, forKey: "slingshot_revision")
         
         if (pluignConfig?.reloadWebviewOnNewRelease ?? false) {
             DispatchQueue.main.async {
