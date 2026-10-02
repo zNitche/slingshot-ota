@@ -1,0 +1,2 @@
+let SLINGSHOT_CAPACITOR_DEFAULT_SERVER_PATH_KEY = "slingshot_capacitor_default_server_path"
+let SLINGSHOT_REVISION_KEY = "slingshot_revision"
