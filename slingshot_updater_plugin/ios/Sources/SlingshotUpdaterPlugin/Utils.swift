@@ -1,29 +1,6 @@
 import Foundation
 
 
-func getSlingshotFilePath(pathItems: [String]) throws -> URL {
-    var url = try FileManager.default.url(
-        for: .applicationSupportDirectory,
-        in: .userDomainMask,
-        appropriateFor: nil,
-        create: true,
-    )
-    
-    url = url.appending(path: "slingshot", directoryHint: .isDirectory)
-    
-    try? FileManager.default.createDirectory(
-        at: url,
-        withIntermediateDirectories: true
-    )
-    
-
-    for item in pathItems {
-        url = url.appending(path: item, directoryHint: .checkFileSystem)
-    }
-    
-    return url
-}
-
 func writeToFile(filePath: URL, content: String) throws {
     try content.write(
         to: filePath,
@@ -34,4 +11,13 @@ func writeToFile(filePath: URL, content: String) throws {
 
 func readFromFile(filePath: URL) throws -> String {
     return try String(contentsOf: filePath, encoding: .utf8)
+}
+
+func loadJsonObject<T>(fileURL: URL, serializable: T.Type) throws -> T where T : Decodable {
+    let data = try Data(contentsOf: fileURL)
+    return try JSONDecoder().decode(serializable.self, from: data)
+}
+
+func dumpJsonObject<T>(encodable: T) throws -> Data where T : Encodable {
+    return try JSONEncoder().encode(encodable)
 }

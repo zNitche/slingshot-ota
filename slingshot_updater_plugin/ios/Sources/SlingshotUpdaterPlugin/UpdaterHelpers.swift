@@ -1,6 +1,29 @@
 import Foundation
 
 
+func getSlingshotFilePath(pathItems: [String]) throws -> URL {
+    var url = try FileManager.default.url(
+        for: .applicationSupportDirectory,
+        in: .userDomainMask,
+        appropriateFor: nil,
+        create: true,
+    )
+    
+    url = url.appending(path: "slingshot", directoryHint: .isDirectory)
+    
+    try? FileManager.default.createDirectory(
+        at: url,
+        withIntermediateDirectories: true
+    )
+    
+    
+    for item in pathItems {
+        url = url.appending(path: item, directoryHint: .checkFileSystem)
+    }
+    
+    return url
+}
+
 func doesRevisionNumberFileExist() -> Bool {
     guard let url = try? getSlingshotFilePath(pathItems: ["revision.json"]) else {
         return false
@@ -15,16 +38,14 @@ func writeRevisionNumberToFile(num: String) throws {
     let appVersion = try getAppVersion()
     
     let data = RevisionDetails(revisionNumber: num, appVersion: appVersion)
-    let dataJson = try JSONEncoder().encode(data)
+    let dataJson = try dumpJsonObject(encodable: data)
     
     try dataJson.write(to: url!)
 }
 
 func readRevisionNumberFromFile() throws -> RevisionDetails {
-    let url = try? getSlingshotFilePath(pathItems: ["revision.json"])
-    
-    let data = try Data(contentsOf: url!)
-    return try JSONDecoder().decode(RevisionDetails.self, from: data)
+    let url = try getSlingshotFilePath(pathItems: ["revision.json"])
+    return try loadJsonObject(fileURL: url, serializable: RevisionDetails.self)
 }
 
 func checkIfNewRevisionShouldBeFetched(metadata: RevisionMetadata) throws -> Bool {
@@ -65,7 +86,7 @@ func loadPluginConfig() throws -> SlingshotConfig {
 
 func getRevisionDir(type: RevisionDirectoryType) throws -> URL {
     var dir = try getSlingshotFilePath(pathItems: [type.rawValue])
-
+    
     try? FileManager.default.createDirectory(
         at: dir,
         withIntermediateDirectories: true
