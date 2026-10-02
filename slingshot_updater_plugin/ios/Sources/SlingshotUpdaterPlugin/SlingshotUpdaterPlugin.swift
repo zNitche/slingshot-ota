@@ -92,6 +92,10 @@ public class SlingshotUpdaterPlugin: CAPPlugin, CAPBridgedPlugin {
                     debugPrint("[SHT][ERROR] mainloopPoolingTask:", error)
                 }
                 
+                if ((pluignConfig?.periodicUpdater ?? false) == false) {
+                    mainloopPoolingTask?.cancel()
+                }
+                
                 if (Task.isCancelled) {
                     break
                 }
@@ -102,6 +106,8 @@ public class SlingshotUpdaterPlugin: CAPPlugin, CAPBridgedPlugin {
                     break
                 }
             }
+            
+            debugPrint("[SHT] mainloopPoolingTask done.")
         }
     }
     
