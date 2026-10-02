@@ -51,11 +51,6 @@ func readRevisionNumberFromFile() throws -> RevisionDetails {
 func checkIfNewRevisionShouldBeFetched(metadata: RevisionMetadata) throws -> Bool {
     if (doesRevisionNumberFileExist()) {
         let currentRevision = try readRevisionNumberFromFile()
-        let appVersion = try getAppVersion()
-        
-        if (currentRevision.appVersion != appVersion) {
-            return true
-        }
         
         return currentRevision.revisionNumber != metadata.sha256sum
     }

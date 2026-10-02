@@ -30,7 +30,7 @@ public class SlingshotUpdaterPlugin: CAPPlugin, CAPBridgedPlugin {
     
     override public func load() {
         super.load();
-
+        
         self.setupAppStateNotifications();
         
         self.pluignConfig = try? loadPluginConfig()
@@ -77,6 +77,8 @@ public class SlingshotUpdaterPlugin: CAPPlugin, CAPBridgedPlugin {
         mainloopPoolingTask = Task {
             while !Task.isCancelled {
                 do {
+                    try? validateRevisionForCurrentVersion();
+                    
                     let got_new_update = try await implementation.check_for_update()
                     
                     if (got_new_update) {
@@ -103,6 +105,46 @@ public class SlingshotUpdaterPlugin: CAPPlugin, CAPBridgedPlugin {
         }
     }
     
+    private func reloadWebView() {
+        if (pluignConfig?.reloadWebviewOnNewRelease ?? false) {
+            debugPrint("[SHT] reloading webview")
+            
+            DispatchQueue.main.async {
+                self.bridge?.webView?.reload()
+            }
+        }
+    }
+    
+    private func validateRevisionForCurrentVersion() throws {
+        let currentRevision = try readRevisionNumberFromFile()
+        let appVersion = try getAppVersion()
+        
+        if (currentRevision.appVersion == appVersion) {
+            return
+        }
+        
+        debugPrint("[SHT] current revision target app version doesn't match app version, removing")
+        
+        UserDefaults.standard.removeObject(forKey: SLINGSHOT_REVISION_KEY)
+        
+        try? removeRevisionDir(type: .current)
+        try? removeRevisionDir(type: .tmp)
+        
+        let revisionJsonURL = try? getSlingshotFilePath(pathItems: ["revision.json"])
+        if (revisionJsonURL != nil) {
+            try? FileManager.default.removeItem(at: revisionJsonURL!)
+        }
+        
+        let capacitorDefaultURL = UserDefaults.standard.string(forKey: SLINGSHOT_CAPACITOR_DEFAULT_SERVER_PATH_KEY)
+        
+        if (capacitorDefaultURL == nil) {
+            return
+        }
+        
+        self.bridge?.setServerBasePath(capacitorDefaultURL!)
+        reloadWebView()
+    }
+    
     private func set_slingshot_revision() throws {
         if (!(try doesRevisionNumberFileExist())) {
             return
@@ -111,12 +153,11 @@ public class SlingshotUpdaterPlugin: CAPPlugin, CAPBridgedPlugin {
         let revisionNumber = try readRevisionNumberFromFile()
         try checkRevisionDirectory()
         
-        UserDefaults.standard.set(revisionNumber.revisionNumber, forKey: "slingshot_revision")
+        UserDefaults.standard.set(revisionNumber.revisionNumber, forKey: SLINGSHOT_REVISION_KEY)
         
-        if (pluignConfig?.reloadWebviewOnNewRelease ?? false) {
-            DispatchQueue.main.async {
-                self.bridge?.webView?.reload()
-            }
-        }
+        let revisionDirURL = try getRevisionDir(type: .current)
+        self.bridge?.setServerBasePath(revisionDirURL.path(percentEncoded: false))
+        
+        reloadWebView()
     }
 }
