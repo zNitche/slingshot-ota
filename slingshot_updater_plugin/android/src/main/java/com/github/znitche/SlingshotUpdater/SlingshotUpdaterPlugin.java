@@ -1,4 +1,4 @@
-package sh.znitche.SlingshotUpdater;
+package com.github.znitche.SlingshotUpdater;
 
 import com.getcapacitor.JSObject;
 import com.getcapacitor.Plugin;

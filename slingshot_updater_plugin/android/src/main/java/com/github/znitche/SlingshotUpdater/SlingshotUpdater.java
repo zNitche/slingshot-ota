@@ -1,4 +1,4 @@
-package sh.znitche.SlingshotUpdater;
+package com.github.znitche.SlingshotUpdater;
 
 import com.getcapacitor.Logger;
 
