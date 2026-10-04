@@ -4,8 +4,7 @@ import com.getcapacitor.Logger;
 
 public class SlingshotUpdater {
 
-    public String echo(String value) {
-        Logger.info("Echo", value);
-        return value;
+    public String get_revision_number() {
+        return "mock revision value";
     }
 }
