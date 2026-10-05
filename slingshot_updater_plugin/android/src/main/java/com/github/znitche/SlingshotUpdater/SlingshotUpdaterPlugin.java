@@ -6,9 +6,13 @@ import com.getcapacitor.Logger;
 import com.getcapacitor.PluginCall;
 import com.getcapacitor.PluginMethod;
 import com.getcapacitor.annotation.CapacitorPlugin;
+import com.github.znitche.SlingshotUpdater.classes.SlingshotConfig;
+
+import java.io.InputStream;
 
 @CapacitorPlugin(name = "SlingshotUpdater")
 public class SlingshotUpdaterPlugin extends Plugin {
+    private SlingshotConfig pluginConfig = null;
 
     private final SlingshotUpdater implementation = new SlingshotUpdater();
 
@@ -17,7 +21,20 @@ public class SlingshotUpdaterPlugin extends Plugin {
         JSObject ret = new JSObject();
         ret.put("value", implementation.get_revision_number());
 
-        Logger.debug("value: " + implementation.get_revision_number());
         call.resolve(ret);
+    }
+
+    @Override
+    public void load() {
+        super.load();
+
+        try {
+            InputStream pluginConfigStream = getContext().getAssets().open("slingshot.json");
+            this.pluginConfig = UpdaterHelpers.loadSlingshotConfig(pluginConfigStream);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("Failed to setup SlingshotUpdater", e);
+        }
     }
 }
