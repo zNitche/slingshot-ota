@@ -1,0 +1,26 @@
+def appProject = project(":app")
+
+def configJsonName = "slingshot.json"
+def slingshotAssetsDirName = "slingshot-assets"
+def slingshotConfigPath = file("${appProject.projectDir}/${configJsonName}")
+
+def slingshotAssetsDirPath = file("${appProject.layout.buildDirectory.get().asFile}/generated/${slingshotAssetsDirName}")
+
+def copySlingshotConfigToAppAssets = appProject.tasks.register("copySlingshotConfigToAppAssets", Copy) {
+    from(slingshotConfigPath)
+    into(slingshotAssetsDirPath)
+
+    doFirst {
+        if (!slingshotConfigPath.exists()) {
+            throw new org.gradle.api.GradleException("${configJsonName} has not been found")
+        }
+    }
+}
+
+appProject.plugins.withId("com.android.application") {
+    appProject.android.sourceSets.main.assets.srcDir(slingshotAssetsDirPath)
+}
+
+appProject.tasks.named('preBuild') {
+    dependsOn(copySlingshotConfigToAppAssets)
+}
