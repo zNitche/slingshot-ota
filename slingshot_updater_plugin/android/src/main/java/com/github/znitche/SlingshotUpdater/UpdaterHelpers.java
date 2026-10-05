@@ -1,5 +1,7 @@
 package com.github.znitche.SlingshotUpdater;
 
+import android.content.Context;
+
 import com.github.znitche.SlingshotUpdater.classes.SlingshotConfig;
 import com.google.gson.Gson;
 
@@ -9,11 +11,14 @@ import java.nio.charset.StandardCharsets;
 
 
 public class UpdaterHelpers {
-    public static SlingshotConfig loadSlingshotConfig(InputStream fileStream) {
+    public static SlingshotConfig loadSlingshotConfig(Context capContext) {
         Gson gson = new Gson();
 
-        try (InputStreamReader fileReader =
-                     new InputStreamReader(fileStream, StandardCharsets.UTF_8)) {
+        try {
+            InputStream pluginConfigStream = capContext.getAssets().open("slingshot.json");
+            InputStreamReader fileReader =
+                    new InputStreamReader(pluginConfigStream, StandardCharsets.UTF_8);
+
             return gson.fromJson(fileReader, SlingshotConfig.class);
         } catch (Exception e) {
             return null;

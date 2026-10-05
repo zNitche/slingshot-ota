@@ -29,8 +29,7 @@ public class SlingshotUpdaterPlugin extends Plugin {
         super.load();
 
         try {
-            InputStream pluginConfigStream = getContext().getAssets().open("slingshot.json");
-            this.pluginConfig = UpdaterHelpers.loadSlingshotConfig(pluginConfigStream);
+            this.pluginConfig = UpdaterHelpers.loadSlingshotConfig(getContext());
 
         } catch (Exception e) {
             e.printStackTrace();
