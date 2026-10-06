@@ -1,5 +1,7 @@
 package com.github.znitche.SlingshotUpdater;
 
+import android.content.Context;
+
 import com.getcapacitor.JSObject;
 import com.getcapacitor.Plugin;
 import com.getcapacitor.Logger;
@@ -29,7 +31,10 @@ public class SlingshotUpdaterPlugin extends Plugin {
         super.load();
 
         try {
-            this.pluginConfig = UpdaterHelpers.loadSlingshotConfig(getContext());
+            Context capContext = getContext();
+
+            this.pluginConfig = UpdaterHelpers.loadSlingshotConfig(capContext);
+            this.implementation.setup(capContext, pluginConfig);
 
         } catch (Exception e) {
             e.printStackTrace();
