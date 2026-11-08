@@ -4,18 +4,20 @@ import android.content.Context;
 
 import com.getcapacitor.JSObject;
 import com.getcapacitor.Plugin;
-import com.getcapacitor.Logger;
 import com.getcapacitor.PluginCall;
 import com.getcapacitor.PluginMethod;
 import com.getcapacitor.annotation.CapacitorPlugin;
 import com.github.znitche.SlingshotUpdater.classes.SlingshotConfig;
 
-import java.io.InputStream;
-
+/**
+ * Please read the Capacitor Android Plugin Development Guide
+ * here: https://capacitorjs.com/docs/plugins/android
+ */
 @CapacitorPlugin(name = "SlingshotUpdater")
 public class SlingshotUpdaterPlugin extends Plugin {
     private final SlingshotUpdater implementation = new SlingshotUpdater();
     private SlingshotConfig pluginConfig = null;
+    public static FilesUtils filesUtils;
     public static UpdaterHelpers updaterHelpers;
 
     @PluginMethod
@@ -33,6 +35,7 @@ public class SlingshotUpdaterPlugin extends Plugin {
         try {
             Context capContext = getContext();
 
+            filesUtils = new FilesUtils(capContext);
             updaterHelpers = new UpdaterHelpers(capContext);
 
             this.pluginConfig = updaterHelpers.loadSlingshotConfig();
