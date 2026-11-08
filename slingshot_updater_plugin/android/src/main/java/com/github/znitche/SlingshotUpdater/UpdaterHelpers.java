@@ -5,6 +5,8 @@ import android.content.Context;
 import com.github.znitche.SlingshotUpdater.classes.SlingshotConfig;
 import com.google.gson.Gson;
 
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -12,13 +14,44 @@ import java.nio.charset.StandardCharsets;
 
 
 public class UpdaterHelpers {
-    public static SlingshotConfig loadSlingshotConfig(Context capContext) throws IOException {
+    private final Context context;
+
+    public UpdaterHelpers(Context context) {
+        this.context = context.getApplicationContext();
+    }
+
+    public String readFromFile(String fileName) throws IOException {
+        try (FileInputStream fis = this.context.openFileInput(fileName)) {
+            return new String(fis.readAllBytes(), StandardCharsets.UTF_8);
+        }
+    }
+
+    public void writeToFile(String fileName, String data) throws IOException {
+        try (FileOutputStream fos = this.context.openFileOutput(
+                fileName, Context.MODE_PRIVATE)) {
+
+            fos.write(data.getBytes(StandardCharsets.UTF_8));
+        }
+    }
+
+    public <T> void dumpJson(T obj, String fileName) throws IOException {
+        Gson gson = new Gson();
+        String dump = gson.toJson(obj);
+
+        writeToFile(dump, fileName);
+    }
+
+    public <T> T loadJson(Class<T> targetClass, String fileName) throws IOException {
         Gson gson = new Gson();
 
-        InputStream pluginConfigStream = capContext.getAssets().open("slingshot.json");
+        InputStream fileStream = this.context.getAssets().open(fileName);
         InputStreamReader fileReader =
-                new InputStreamReader(pluginConfigStream, StandardCharsets.UTF_8);
+                new InputStreamReader(fileStream, StandardCharsets.UTF_8);
 
-        return gson.fromJson(fileReader, SlingshotConfig.class);
+        return gson.fromJson(fileReader, targetClass);
+    }
+
+    public SlingshotConfig loadSlingshotConfig() throws IOException {
+        return loadJson(SlingshotConfig.class, "slingshot.json");
     }
 }

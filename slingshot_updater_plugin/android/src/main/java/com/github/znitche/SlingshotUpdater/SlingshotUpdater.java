@@ -15,6 +15,6 @@ public class SlingshotUpdater {
     }
 
     public String get_revision_number() {
-        return "123";
+        return this.pluginConfig.getUrl();
     }
 }

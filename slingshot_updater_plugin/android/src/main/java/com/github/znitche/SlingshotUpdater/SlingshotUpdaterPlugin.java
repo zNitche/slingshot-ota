@@ -14,9 +14,9 @@ import java.io.InputStream;
 
 @CapacitorPlugin(name = "SlingshotUpdater")
 public class SlingshotUpdaterPlugin extends Plugin {
-    private SlingshotConfig pluginConfig = null;
-
     private final SlingshotUpdater implementation = new SlingshotUpdater();
+    private SlingshotConfig pluginConfig = null;
+    public static UpdaterHelpers updaterHelpers;
 
     @PluginMethod
     public void get_revision_number(PluginCall call) {
@@ -33,7 +33,9 @@ public class SlingshotUpdaterPlugin extends Plugin {
         try {
             Context capContext = getContext();
 
-            this.pluginConfig = UpdaterHelpers.loadSlingshotConfig(capContext);
+            updaterHelpers = new UpdaterHelpers(capContext);
+
+            this.pluginConfig = updaterHelpers.loadSlingshotConfig();
             this.implementation.setup(capContext, pluginConfig);
 
         } catch (Exception e) {
