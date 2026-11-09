@@ -46,4 +46,28 @@ public class SlingshotUpdaterPlugin extends Plugin {
             throw new RuntimeException("Failed to setup SlingshotUpdater", e);
         }
     }
+
+    private void setupAppStateNotifications() {
+
+    }
+
+    private void updaterCleanup() {
+
+    }
+
+    private void runUpdaterMainloop() {
+
+    }
+
+    private void reloadWebView() {
+
+    }
+
+    private void validateRevisionForCurrentVersion() {
+
+    }
+
+    private void setSlingshotRevision() {
+        
+    }
 }
