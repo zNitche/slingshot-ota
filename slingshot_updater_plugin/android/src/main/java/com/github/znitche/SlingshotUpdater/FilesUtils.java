@@ -4,6 +4,7 @@ import android.content.Context;
 
 import com.google.gson.Gson;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -17,6 +18,11 @@ public class FilesUtils {
 
     public FilesUtils(Context context) {
         this.context = context.getApplicationContext();
+    }
+
+    public boolean fileExists(String fileName) {
+        File file = new File(context.getFilesDir(), fileName);
+        return file.exists();
     }
 
     public String readFromFile(String fileName) throws IOException {
