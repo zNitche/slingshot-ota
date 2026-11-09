@@ -1,7 +1,8 @@
-package com.github.znitche.SlingshotUpdater;
+package com.github.znitche.SlingshotUpdater.helpers;
 
 import android.content.Context;
 
+import com.github.znitche.SlingshotUpdater.SlingshotUpdaterPlugin;
 import com.github.znitche.SlingshotUpdater.classes.SlingshotConfig;
 
 import java.io.IOException;

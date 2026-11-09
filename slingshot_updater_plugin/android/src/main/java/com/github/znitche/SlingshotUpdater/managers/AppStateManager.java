@@ -1,4 +1,4 @@
-package com.github.znitche.SlingshotUpdater;
+package com.github.znitche.SlingshotUpdater.managers;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.DefaultLifecycleObserver;

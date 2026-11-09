@@ -1,4 +1,4 @@
-package com.github.znitche.SlingshotUpdater;
+package com.github.znitche.SlingshotUpdater.helpers;
 
 import android.content.Context;
 

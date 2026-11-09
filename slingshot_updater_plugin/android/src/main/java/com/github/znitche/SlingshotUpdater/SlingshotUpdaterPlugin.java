@@ -10,6 +10,9 @@ import com.getcapacitor.PluginMethod;
 import com.getcapacitor.annotation.CapacitorPlugin;
 import com.github.znitche.SlingshotUpdater.classes.AppStateListener;
 import com.github.znitche.SlingshotUpdater.classes.SlingshotConfig;
+import com.github.znitche.SlingshotUpdater.helpers.FilesUtils;
+import com.github.znitche.SlingshotUpdater.helpers.UpdaterHelpers;
+import com.github.znitche.SlingshotUpdater.managers.AppStateManager;
 
 /**
  * Please read the Capacitor Android Plugin Development Guide
@@ -45,6 +48,9 @@ public class SlingshotUpdaterPlugin extends Plugin {
             this.implementation.setup(capContext, pluginConfig);
 
             this.setupAppStateNotifications();
+
+            this.updaterCleanup();
+            this.runUpdaterMainloop();
 
         } catch (Exception e) {
             e.printStackTrace();
