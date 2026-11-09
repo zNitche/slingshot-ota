@@ -79,11 +79,11 @@ public class SlingshotUpdaterPlugin: CAPPlugin, CAPBridgedPlugin {
                 do {
                     try? validateRevisionForCurrentVersion();
                     
-                    let got_new_update = try await implementation.check_for_update()
+                    let got_new_update = try await implementation.checkForUpdate()
                     
                     if (got_new_update) {
                         debugPrint("[SHT] setting up new revision/release")
-                        try self.set_slingshot_revision()
+                        try self.setSlingshotRevision()
                     }
                 } catch is CancellationError {
                     debugPrint("[SHT] mainloopPoolingTask cancelled")
@@ -151,7 +151,7 @@ public class SlingshotUpdaterPlugin: CAPPlugin, CAPBridgedPlugin {
         reloadWebView()
     }
     
-    private func set_slingshot_revision() throws {
+    private func setSlingshotRevision() throws {
         if (!(try doesRevisionNumberFileExist())) {
             return
         }

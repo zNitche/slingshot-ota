@@ -79,7 +79,7 @@ import ZIPFoundation
         return metadata;
     }
     
-    func check_for_update() async throws -> Bool {
+    func checkForUpdate() async throws -> Bool {
         debugPrint("[SHT] checking for new revision")
 
         if (backendUrlBase?.path() == nil) {
