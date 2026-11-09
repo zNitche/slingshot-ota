@@ -13,6 +13,7 @@ import com.github.znitche.SlingshotUpdater.classes.SlingshotConfig;
 import com.github.znitche.SlingshotUpdater.helpers.FilesUtils;
 import com.github.znitche.SlingshotUpdater.helpers.UpdaterHelpers;
 import com.github.znitche.SlingshotUpdater.managers.AppStateManager;
+import com.github.znitche.SlingshotUpdater.managers.MainLoopPoolingTask;
 
 /**
  * Please read the Capacitor Android Plugin Development Guide
@@ -21,6 +22,7 @@ import com.github.znitche.SlingshotUpdater.managers.AppStateManager;
 @CapacitorPlugin(name = "SlingshotUpdater")
 public class SlingshotUpdaterPlugin extends Plugin {
     private final SlingshotUpdater implementation = new SlingshotUpdater();
+    private MainLoopPoolingTask mainLoopPoolingTask = null;
     private AppStateManager appStateManager;
     private SlingshotConfig pluginConfig = null;
     public static FilesUtils filesUtils;
@@ -50,7 +52,7 @@ public class SlingshotUpdaterPlugin extends Plugin {
             this.setupAppStateNotifications();
 
             this.updaterCleanup();
-            this.runUpdaterMainloop();
+            this.runUpdaterMainLoop();
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -63,7 +65,7 @@ public class SlingshotUpdaterPlugin extends Plugin {
             @Override
             public void onForeground() {
                 Log.d("SlingshotUpdater", "app enters foreground");
-                runUpdaterMainloop();
+                runUpdaterMainLoop();
             }
 
             @Override
@@ -75,11 +77,32 @@ public class SlingshotUpdaterPlugin extends Plugin {
     }
 
     private void updaterCleanup() {
+        if (this.mainLoopPoolingTask != null) {
+            this.mainLoopPoolingTask.stop();
+        }
 
+        this.mainLoopPoolingTask = null;
     }
 
-    private void runUpdaterMainloop() {
+    private void runUpdaterMainLoop() {
+        if (this.appStateManager.getIsInBackground()) {
+            return;
+        }
 
+        if (this.mainLoopPoolingTask != null) {
+            return;
+        }
+
+        this.mainLoopPoolingTask = new MainLoopPoolingTask(
+                () -> {
+                    Log.d("SlingshotUpdater", this.appStateManager.getIsInBackground().toString());
+                    ;
+                },
+                this.pluginConfig.getIsPeriodicUpdater(),
+                this.pluginConfig.getUpdaterTickInterval()
+        );
+
+        this.mainLoopPoolingTask.start();
     }
 
     private void reloadWebView() {

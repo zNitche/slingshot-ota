@@ -29,6 +29,8 @@ public class AppStateManager implements DefaultLifecycleObserver {
 
     @Override
     public void onStart(@NonNull LifecycleOwner owner) {
+        this.isInBackground = Boolean.FALSE;
+
         if (listener != null) {
             listener.onForeground();
         }
@@ -36,6 +38,8 @@ public class AppStateManager implements DefaultLifecycleObserver {
 
     @Override
     public void onStop(@NonNull LifecycleOwner owner) {
+        this.isInBackground = Boolean.TRUE;
+
         if (listener != null) {
             listener.onBackground();
         }
