@@ -1,4 +1,4 @@
-package com.github.znitche.SlingshotUpdater.managers;
+package com.github.znitche.SlingshotUpdater.core;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
