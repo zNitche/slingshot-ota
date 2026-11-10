@@ -9,11 +9,17 @@ import com.getcapacitor.PluginCall;
 import com.getcapacitor.PluginMethod;
 import com.getcapacitor.annotation.CapacitorPlugin;
 import com.github.znitche.SlingshotUpdater.classes.AppStateListener;
+import com.github.znitche.SlingshotUpdater.classes.RevisionMetadata;
 import com.github.znitche.SlingshotUpdater.classes.SlingshotConfig;
+import com.github.znitche.SlingshotUpdater.core.ApiClient;
 import com.github.znitche.SlingshotUpdater.helpers.FilesUtils;
 import com.github.znitche.SlingshotUpdater.helpers.UpdaterHelpers;
-import com.github.znitche.SlingshotUpdater.managers.AppStateManager;
-import com.github.znitche.SlingshotUpdater.managers.MainLoopPoolingTask;
+import com.github.znitche.SlingshotUpdater.core.AppStateManager;
+import com.github.znitche.SlingshotUpdater.core.MainLoopPoolingTask;
+
+import java.io.IOException;
+
+import retrofit2.Call;
 
 /**
  * Please read the Capacitor Android Plugin Development Guide
@@ -24,6 +30,7 @@ public class SlingshotUpdaterPlugin extends Plugin {
     private final SlingshotUpdater implementation = new SlingshotUpdater();
     private MainLoopPoolingTask mainLoopPoolingTask = null;
     private AppStateManager appStateManager;
+    private static ApiClient apiClient;
     private SlingshotConfig pluginConfig = null;
     public static FilesUtils filesUtils;
     public static UpdaterHelpers updaterHelpers;
@@ -48,6 +55,8 @@ public class SlingshotUpdaterPlugin extends Plugin {
 
             this.pluginConfig = updaterHelpers.loadSlingshotConfig();
             this.implementation.setup(capContext, pluginConfig);
+
+            apiClient = new ApiClient(this.pluginConfig.getUrl());
 
             this.setupAppStateNotifications();
 
@@ -96,7 +105,17 @@ public class SlingshotUpdaterPlugin extends Plugin {
         this.mainLoopPoolingTask = new MainLoopPoolingTask(
                 () -> {
                     Log.d("SlingshotUpdater", this.appStateManager.getIsInBackground().toString());
-                    ;
+
+                    String appVersion = updaterHelpers.getAppVersion();
+                    Call<RevisionMetadata> getFetchRevisionMetadataCall = apiClient.getFetchRevisionMetadataCall(appVersion);
+
+                    try {
+                        RevisionMetadata metadata = getFetchRevisionMetadataCall.execute().body();
+
+                        Log.d("SlingshotUpdater", metadata.sha256sum);
+                    } catch (Exception e) {
+                        Log.d("SlingshotUpdater", "failed to fetch revision metadata " + e);
+                    }
                 },
                 this.pluginConfig.getIsPeriodicUpdater(),
                 this.pluginConfig.getUpdaterTickInterval()

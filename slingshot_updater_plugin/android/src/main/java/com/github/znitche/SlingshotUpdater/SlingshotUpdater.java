@@ -31,9 +31,9 @@ public class SlingshotUpdater {
 
     }
 
-    private RevisionMetadata getRevisionMetadata() {
-        return new RevisionMetadata("", "", "");
-    }
+//    private RevisionMetadata getRevisionMetadata() {
+//        return new RevisionMetadata("", "", "");
+//    }
 
     public Boolean checkForUpdate() {
         return false;
