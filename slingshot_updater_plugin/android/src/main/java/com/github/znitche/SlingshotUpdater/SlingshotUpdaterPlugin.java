@@ -9,7 +9,6 @@ import com.getcapacitor.PluginCall;
 import com.getcapacitor.PluginMethod;
 import com.getcapacitor.annotation.CapacitorPlugin;
 import com.github.znitche.SlingshotUpdater.classes.AppStateListener;
-import com.github.znitche.SlingshotUpdater.classes.RevisionMetadata;
 import com.github.znitche.SlingshotUpdater.classes.SlingshotConfig;
 import com.github.znitche.SlingshotUpdater.core.api.ApiClient;
 import com.github.znitche.SlingshotUpdater.helpers.FilesUtils;
@@ -17,6 +16,7 @@ import com.github.znitche.SlingshotUpdater.helpers.UpdaterHelpers;
 import com.github.znitche.SlingshotUpdater.core.AppStateManager;
 import com.github.znitche.SlingshotUpdater.core.MainLoopPoolingTask;
 
+import kotlin.NotImplementedError;
 import retrofit2.Call;
 
 /**
@@ -28,8 +28,8 @@ public class SlingshotUpdaterPlugin extends Plugin {
     private final SlingshotUpdater implementation = new SlingshotUpdater();
     private MainLoopPoolingTask mainLoopPoolingTask = null;
     private AppStateManager appStateManager;
-    private static ApiClient apiClient;
     private SlingshotConfig pluginConfig = null;
+    public static ApiClient apiClient;
     public static FilesUtils filesUtils;
     public static UpdaterHelpers updaterHelpers;
 
@@ -62,7 +62,7 @@ public class SlingshotUpdaterPlugin extends Plugin {
             this.runUpdaterMainLoop();
 
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.e("[SHT]", e.toString());
             throw new RuntimeException("Failed to setup SlingshotUpdater", e);
         }
     }
@@ -71,13 +71,13 @@ public class SlingshotUpdaterPlugin extends Plugin {
         this.appStateManager = new AppStateManager(new AppStateListener() {
             @Override
             public void onForeground() {
-                Log.d("SlingshotUpdater", "app enters foreground");
+                Log.d("[SHT]", "app enters foreground");
                 runUpdaterMainLoop();
             }
 
             @Override
             public void onBackground() {
-                Log.d("SlingshotUpdater", "app enters background");
+                Log.d("[SHT]", "app enters background");
                 updaterCleanup();
             }
         });
@@ -102,17 +102,12 @@ public class SlingshotUpdaterPlugin extends Plugin {
 
         this.mainLoopPoolingTask = new MainLoopPoolingTask(
                 () -> {
-                    Log.d("SlingshotUpdater", this.appStateManager.getIsInBackground().toString());
-
-                    String appVersion = updaterHelpers.getAppVersion();
-                    Call<RevisionMetadata> getFetchRevisionMetadataCall = apiClient.getFetchRevisionMetadataCall(appVersion);
-
                     try {
-                        RevisionMetadata metadata = getFetchRevisionMetadataCall.execute().body();
+                        Boolean gotNewRevision = this.implementation.checkForUpdate();
 
-                        Log.d("SlingshotUpdater", metadata.sha256sum);
+                        Log.d("[SHT]", "got new revision ? : " + gotNewRevision);
                     } catch (Exception e) {
-                        Log.d("SlingshotUpdater", "failed to fetch revision metadata " + e);
+                        Log.d("[SHT]", "mainLoopPoolingTask error: " + e);
                     }
                 },
                 this.pluginConfig.getIsPeriodicUpdater(),
@@ -123,14 +118,14 @@ public class SlingshotUpdaterPlugin extends Plugin {
     }
 
     private void reloadWebView() {
-
+        throw new NotImplementedError();
     }
 
     private void validateRevisionForCurrentVersion() {
-
+        throw new NotImplementedError();
     }
 
     private void setSlingshotRevision() {
-
+        throw new NotImplementedError();
     }
 }

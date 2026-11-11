@@ -1,10 +1,14 @@
 package com.github.znitche.SlingshotUpdater;
 
 import android.content.Context;
+import android.util.Log;
 
-import com.getcapacitor.Logger;
+import com.github.znitche.SlingshotUpdater.classes.RevisionDirectoryType;
 import com.github.znitche.SlingshotUpdater.classes.RevisionMetadata;
 import com.github.znitche.SlingshotUpdater.classes.SlingshotConfig;
+
+import kotlin.NotImplementedError;
+import retrofit2.Call;
 
 public class SlingshotUpdater {
     private Context capContext;
@@ -20,22 +24,63 @@ public class SlingshotUpdater {
     }
 
     private void fetchNewRevision(RevisionMetadata metadata) {
-
+        throw new NotImplementedError();
     }
 
     private Boolean validateNewRevision(RevisionMetadata metadata) {
-        return  false;
+        throw new NotImplementedError();
     }
 
     private void extractReleaseZip() {
-
+        throw new NotImplementedError();
     }
 
-//    private RevisionMetadata getRevisionMetadata() {
-//        return new RevisionMetadata("", "", "");
-//    }
+    private RevisionMetadata getRevisionMetadata() {
+        String appVersion = SlingshotUpdaterPlugin.updaterHelpers.getAppVersion();
+        Call<RevisionMetadata> getFetchRevisionMetadataCall = SlingshotUpdaterPlugin.apiClient.getFetchRevisionMetadataCall(appVersion);
+
+        try {
+            return getFetchRevisionMetadataCall.execute().body();
+        } catch (Exception e) {
+            Log.d("[SHT]", "failed to fetch revision metadata " + e);
+        }
+
+        return null;
+    }
 
     public Boolean checkForUpdate() {
+        RevisionMetadata metadata = this.getRevisionMetadata();
+
+        if (metadata == null) {
+            return  false;
+        }
+
+        Log.d("[SHT]", "got revision metadata");
+
+        Boolean shouldNewRevisionBeFetched = SlingshotUpdaterPlugin.updaterHelpers.checkIfNewRevisionShouldBeFetched(metadata);
+
+        if (!shouldNewRevisionBeFetched) {
+            return false;
+        }
+
+        Log.d("[SHT]", "fetching new revision");
+        SlingshotUpdaterPlugin.updaterHelpers.removeRevisionDir(RevisionDirectoryType.TMP);
+
+        this.fetchNewRevision(metadata);
+
+        if (!this.validateNewRevision(metadata)) {
+            Log.d("[SHT]", "revision rsa validation has failed");
+            return false;
+        }
+
+        Log.d("[SHT]", "processing revision files");
+
+        SlingshotUpdaterPlugin.updaterHelpers.removeRevisionDir(RevisionDirectoryType.CURRENT);
+        this.extractReleaseZip();
+        SlingshotUpdaterPlugin.updaterHelpers.removeRevisionDir(RevisionDirectoryType.TMP);
+
+        Log.d("[SHT]", "saved new revision, removed tmp dir");
+
         return false;
     }
 }
