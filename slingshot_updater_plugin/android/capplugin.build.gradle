@@ -1,8 +1,12 @@
 def appProject = project(":app")
 
 def configJsonName = "slingshot.json"
+def pubKeyName = "slingshot.pem"
+
 def slingshotAssetsDirName = "slingshot-assets"
+
 def slingshotConfigPath = file("${appProject.projectDir}/${configJsonName}")
+def slingshotPubKeyPath = file("${appProject.projectDir}/${pubKeyName}")
 
 def slingshotAssetsDirPath = file("${appProject.layout.buildDirectory.get().asFile}/generated/${slingshotAssetsDirName}")
 
@@ -17,10 +21,22 @@ def copySlingshotConfigToAppAssets = appProject.tasks.register("copySlingshotCon
     }
 }
 
+def copySlingshotPubKeyToAppAssets = appProject.tasks.register("copySlingshotPubKeyToAppAssets", Copy) {
+    from(slingshotPubKeyPath)
+    into(slingshotAssetsDirPath)
+
+    doFirst {
+        if (!slingshotPubKeyPath.exists()) {
+            throw new org.gradle.api.GradleException("${pubKeyName} has not been found")
+        }
+    }
+}
+
 appProject.plugins.withId("com.android.application") {
     appProject.android.sourceSets.main.assets.srcDir(slingshotAssetsDirPath)
 }
 
 appProject.tasks.named('preBuild') {
+    dependsOn(copySlingshotPubKeyToAppAssets)
     dependsOn(copySlingshotConfigToAppAssets)
 }
