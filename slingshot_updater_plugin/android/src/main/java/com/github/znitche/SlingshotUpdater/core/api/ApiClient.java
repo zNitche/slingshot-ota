@@ -1,7 +1,6 @@
-package com.github.znitche.SlingshotUpdater.core;
+package com.github.znitche.SlingshotUpdater.core.api;
 
 import com.github.znitche.SlingshotUpdater.classes.RevisionMetadata;
-import com.github.znitche.SlingshotUpdater.classes.SlingshotUpdaterApi;
 
 import retrofit2.Call;
 import retrofit2.Retrofit;

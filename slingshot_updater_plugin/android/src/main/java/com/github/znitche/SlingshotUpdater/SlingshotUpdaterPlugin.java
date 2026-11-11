@@ -11,13 +11,11 @@ import com.getcapacitor.annotation.CapacitorPlugin;
 import com.github.znitche.SlingshotUpdater.classes.AppStateListener;
 import com.github.znitche.SlingshotUpdater.classes.RevisionMetadata;
 import com.github.znitche.SlingshotUpdater.classes.SlingshotConfig;
-import com.github.znitche.SlingshotUpdater.core.ApiClient;
+import com.github.znitche.SlingshotUpdater.core.api.ApiClient;
 import com.github.znitche.SlingshotUpdater.helpers.FilesUtils;
 import com.github.znitche.SlingshotUpdater.helpers.UpdaterHelpers;
 import com.github.znitche.SlingshotUpdater.core.AppStateManager;
 import com.github.znitche.SlingshotUpdater.core.MainLoopPoolingTask;
-
-import java.io.IOException;
 
 import retrofit2.Call;
 
