@@ -20,6 +20,26 @@ public class FilesUtils {
         this.context = context.getApplicationContext();
     }
 
+    public void removeDirectory(File directory) {
+        if (directory == null || !directory.exists()) {
+            return;
+        }
+
+        File[] files = directory.listFiles();
+
+        if (files != null) {
+            for (File file : files) {
+                if (file.isDirectory()) {
+                    removeDirectory(file);
+                } else {
+                    file.delete();
+                }
+            }
+        }
+
+        directory.delete();
+    }
+
     public boolean fileExists(String fileName) {
         File file = new File(context.getFilesDir(), fileName);
         return file.exists();
