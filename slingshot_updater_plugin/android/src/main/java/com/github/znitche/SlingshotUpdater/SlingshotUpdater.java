@@ -4,8 +4,13 @@ import android.content.Context;
 import android.util.Log;
 
 import com.github.znitche.SlingshotUpdater.classes.RevisionDirectoryType;
+import com.github.znitche.SlingshotUpdater.classes.RevisionFilesURLs;
 import com.github.znitche.SlingshotUpdater.classes.RevisionMetadata;
 import com.github.znitche.SlingshotUpdater.classes.SlingshotConfig;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 
 import retrofit2.Call;
 
@@ -22,8 +27,23 @@ public class SlingshotUpdater {
         return this.pluginConfig.getUrl();
     }
 
-    private void fetchNewRevision(RevisionMetadata metadata) {
-        throw new UnsupportedOperationException("Not implemented yet");
+    private Boolean fetchNewRevision(RevisionMetadata metadata) {
+        RevisionFilesURLs tmpFilesURLs = SlingshotUpdaterPlugin.updaterHelpers.getRevisionTmpFilesURLs();
+
+        try {
+            File tmpZip = SlingshotUpdaterPlugin.apiClient.downloadRevisionFile(metadata.release_url);
+            File tmpSig = SlingshotUpdaterPlugin.apiClient.downloadRevisionFile(metadata.sig_url);
+
+            SlingshotUpdaterPlugin.updaterHelpers.createTmpDir();
+
+            Files.move(tmpZip.toPath(), tmpFilesURLs.zip.toPath());
+            Files.move(tmpSig.toPath(), tmpFilesURLs.signature.toPath());
+
+            return true;
+        } catch (IOException e) {
+            Log.d("[SHT]", "fetchNewRevision error " + e);
+            return false;
+        }
     }
 
     private Boolean validateNewRevision(RevisionMetadata metadata) {
@@ -63,9 +83,14 @@ public class SlingshotUpdater {
         }
 
         Log.d("[SHT]", "fetching new revision");
-        SlingshotUpdaterPlugin.updaterHelpers.removeRevisionDir(RevisionDirectoryType.TMP);
 
-        this.fetchNewRevision(metadata);
+        SlingshotUpdaterPlugin.updaterHelpers.removeRevisionDir(RevisionDirectoryType.TMP);
+        Boolean fetchNewRevisionStatus = this.fetchNewRevision(metadata);
+
+        if (!fetchNewRevisionStatus) {
+            Log.d("[SHT]", "revision fetch has failed");
+            return false;
+        }
 
         if (!this.validateNewRevision(metadata)) {
             Log.d("[SHT]", "revision rsa validation has failed");

@@ -54,7 +54,7 @@ public class SlingshotUpdaterPlugin extends Plugin {
             this.pluginConfig = updaterHelpers.loadSlingshotConfig();
             this.implementation.setup(capContext, pluginConfig);
 
-            apiClient = new ApiClient(this.pluginConfig.getUrl());
+            apiClient = new ApiClient(capContext, this.pluginConfig.getUrl());
 
             this.setupAppStateNotifications();
 
