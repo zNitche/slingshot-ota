@@ -20,7 +20,7 @@ public class FilesUtils {
         this.context = context.getApplicationContext();
     }
 
-    public void removeDirectory(File directory) {
+    public static void removeDirectory(File directory) {
         if (directory == null || !directory.exists()) {
             return;
         }
@@ -40,15 +40,15 @@ public class FilesUtils {
         directory.delete();
     }
 
+    public static String readFromFile(File file) throws IOException {
+        try (FileInputStream fis = new FileInputStream(file)) {
+            return new String(fis.readAllBytes(), StandardCharsets.UTF_8);
+        }
+    }
+
     public boolean fileExists(String fileName) {
         File file = new File(context.getFilesDir(), fileName);
         return file.exists();
-    }
-
-    public String readFromFile(String fileName) throws IOException {
-        try (FileInputStream fis = this.context.openFileInput(fileName)) {
-            return new String(fis.readAllBytes(), StandardCharsets.UTF_8);
-        }
     }
 
     public void writeToFile(String fileName, String data) throws IOException {
