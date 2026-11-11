@@ -118,14 +118,14 @@ public class SlingshotUpdaterPlugin extends Plugin {
     }
 
     private void reloadWebView() {
-        throw new NotImplementedError();
+        throw new UnsupportedOperationException("Not implemented yet");
     }
 
     private void validateRevisionForCurrentVersion() {
-        throw new NotImplementedError();
+        throw new UnsupportedOperationException("Not implemented yet");
     }
 
     private void setSlingshotRevision() {
-        throw new NotImplementedError();
+        throw new UnsupportedOperationException("Not implemented yet");
     }
 }

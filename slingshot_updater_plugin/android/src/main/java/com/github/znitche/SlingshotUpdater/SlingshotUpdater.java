@@ -7,7 +7,6 @@ import com.github.znitche.SlingshotUpdater.classes.RevisionDirectoryType;
 import com.github.znitche.SlingshotUpdater.classes.RevisionMetadata;
 import com.github.znitche.SlingshotUpdater.classes.SlingshotConfig;
 
-import kotlin.NotImplementedError;
 import retrofit2.Call;
 
 public class SlingshotUpdater {
@@ -24,15 +23,15 @@ public class SlingshotUpdater {
     }
 
     private void fetchNewRevision(RevisionMetadata metadata) {
-        throw new NotImplementedError();
+        throw new UnsupportedOperationException("Not implemented yet");
     }
 
     private Boolean validateNewRevision(RevisionMetadata metadata) {
-        throw new NotImplementedError();
+        throw new UnsupportedOperationException("Not implemented yet");
     }
 
     private void extractReleaseZip() {
-        throw new NotImplementedError();
+        throw new UnsupportedOperationException("Not implemented yet");
     }
 
     private RevisionMetadata getRevisionMetadata() {
