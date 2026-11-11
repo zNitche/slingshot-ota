@@ -8,11 +8,13 @@ import android.util.Log;
 import com.github.znitche.SlingshotUpdater.SlingshotUpdaterPlugin;
 import com.github.znitche.SlingshotUpdater.classes.RevisionDetails;
 import com.github.znitche.SlingshotUpdater.classes.RevisionDirectoryType;
+import com.github.znitche.SlingshotUpdater.classes.RevisionFilesURLs;
 import com.github.znitche.SlingshotUpdater.classes.RevisionMetadata;
 import com.github.znitche.SlingshotUpdater.classes.SlingshotConfig;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.Objects;
 
 public class UpdaterHelpers {
@@ -52,6 +54,19 @@ public class UpdaterHelpers {
             Log.d("[SHT]", "readRevisionDetailsFromFile error: " + e);
             return null;
         }
+    }
+
+    public RevisionFilesURLs getRevisionTmpFilesURLs() {
+        File tmpDir = this.getRevisionDir(RevisionDirectoryType.TMP);
+
+        return new RevisionFilesURLs(
+                new File(tmpDir, "release.zip"),
+                new File(tmpDir, "release.zip.sig")
+        );
+    }
+
+    public void createTmpDir() throws IOException {
+        Files.createDirectories(this.getRevisionDir(RevisionDirectoryType.TMP).toPath());
     }
 
     public File getRevisionDir(RevisionDirectoryType dirType) {
