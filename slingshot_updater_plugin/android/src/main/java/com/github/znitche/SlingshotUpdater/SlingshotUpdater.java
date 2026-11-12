@@ -7,9 +7,12 @@ import com.github.znitche.SlingshotUpdater.classes.RevisionDirectoryType;
 import com.github.znitche.SlingshotUpdater.classes.RevisionFilesURLs;
 import com.github.znitche.SlingshotUpdater.classes.RevisionMetadata;
 import com.github.znitche.SlingshotUpdater.classes.SlingshotConfig;
+import com.github.znitche.SlingshotUpdater.core.Crypto;
+import com.github.znitche.SlingshotUpdater.helpers.FilesUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 
 import retrofit2.Call;
@@ -47,7 +50,20 @@ public class SlingshotUpdater {
     }
 
     private Boolean validateNewRevision(RevisionMetadata metadata) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        RevisionFilesURLs tmpFilesURLs = SlingshotUpdaterPlugin.updaterHelpers.getRevisionTmpFilesURLs();
+
+        InputStream pubKeyInputStream;
+
+        try {
+            pubKeyInputStream = this.capContext.getAssets().open("slingshot.pem");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        Boolean signatureValidationResult = Crypto.validateFile(tmpFilesURLs.zip, pubKeyInputStream, tmpFilesURLs.signature);
+        Boolean hashValidationResult = Crypto.validateFileSHA256(tmpFilesURLs.zip, metadata.sha256sum);
+
+        return signatureValidationResult && hashValidationResult;
     }
 
     private void extractReleaseZip() {
