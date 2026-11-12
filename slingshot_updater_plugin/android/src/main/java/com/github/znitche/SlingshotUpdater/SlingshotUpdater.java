@@ -3,6 +3,7 @@ package com.github.znitche.SlingshotUpdater;
 import android.content.Context;
 import android.util.Log;
 
+import com.github.znitche.SlingshotUpdater.classes.RevisionDetails;
 import com.github.znitche.SlingshotUpdater.classes.RevisionDirectoryType;
 import com.github.znitche.SlingshotUpdater.classes.RevisionFilesURLs;
 import com.github.znitche.SlingshotUpdater.classes.RevisionMetadata;
@@ -27,7 +28,8 @@ public class SlingshotUpdater {
     }
 
     public String get_revision_number() {
-        return this.pluginConfig.getUrl();
+        RevisionDetails revisionDetails = SlingshotUpdaterPlugin.updaterHelpers.readRevisionDetailsFromFile();
+        return revisionDetails.revisionNumber;
     }
 
     private Boolean fetchNewRevision(RevisionMetadata metadata) {
