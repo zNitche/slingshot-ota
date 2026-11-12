@@ -11,6 +11,7 @@ import com.getcapacitor.PluginMethod;
 import com.getcapacitor.annotation.CapacitorPlugin;
 import com.github.znitche.SlingshotUpdater.classes.AppStateListener;
 import com.github.znitche.SlingshotUpdater.classes.RevisionDetails;
+import com.github.znitche.SlingshotUpdater.classes.RevisionDirectoryType;
 import com.github.znitche.SlingshotUpdater.classes.SlingshotConfig;
 import com.github.znitche.SlingshotUpdater.core.api.ApiClient;
 import com.github.znitche.SlingshotUpdater.helpers.FilesUtils;
@@ -18,13 +19,15 @@ import com.github.znitche.SlingshotUpdater.helpers.UpdaterHelpers;
 import com.github.znitche.SlingshotUpdater.core.AppStateManager;
 import com.github.znitche.SlingshotUpdater.core.MainLoopPoolingTask;
 
+import java.io.File;
+
 /**
  * Please read the Capacitor Android Plugin Development Guide
  * here: https://capacitorjs.com/docs/plugins/android
  */
 @CapacitorPlugin(name = "SlingshotUpdater")
 public class SlingshotUpdaterPlugin extends Plugin {
-    private final Bridge capBridge = getBridge();
+    private Bridge capBridge;
     private final SlingshotUpdater implementation = new SlingshotUpdater();
     private MainLoopPoolingTask mainLoopPoolingTask = null;
     private AppStateManager appStateManager;
@@ -47,6 +50,7 @@ public class SlingshotUpdaterPlugin extends Plugin {
 
         try {
             Context capContext = getContext();
+            this.capBridge = getBridge();
 
             filesUtils = new FilesUtils(capContext);
             updaterHelpers = new UpdaterHelpers(capContext);
@@ -127,8 +131,16 @@ public class SlingshotUpdaterPlugin extends Plugin {
         this.mainLoopPoolingTask.start();
     }
 
-    private void reloadWebView() {
-        throw new UnsupportedOperationException("Not implemented yet");
+    private void reloadWebView(Boolean force) {
+        if (!this.pluginConfig.getReloadWebviewOnNewRelease() && !force) {
+            return;
+        }
+
+        getActivity().runOnUiThread(() -> {
+            this.capBridge.getWebView().reload();
+        });
+
+        Log.d("[SHT]", "reloading webview");
     }
 
     private void validateRevisionForCurrentVersion() {
@@ -146,7 +158,9 @@ public class SlingshotUpdaterPlugin extends Plugin {
             throw new Exception("index.html of current revision doesn't exist");
         }
 
-        return;
-//        capBridge.setServerBasePath();
+        File revisionDir = updaterHelpers.getRevisionDir(RevisionDirectoryType.CURRENT);
+        this.capBridge.setServerBasePath(revisionDir.getPath());
+
+        this.reloadWebView(false);
     }
 }

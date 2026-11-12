@@ -99,7 +99,7 @@ public class UpdaterHelpers {
 
     public Boolean checkRevisionDirectory() {
         File revisionDirFile = getRevisionDir(RevisionDirectoryType.CURRENT);
-        File indexHtmlFile = new File(revisionDirFile.toPath().toFile(), "index.html");
+        File indexHtmlFile = new File(revisionDirFile.getPath(), "index.html");
 
         return indexHtmlFile.exists();
     }
