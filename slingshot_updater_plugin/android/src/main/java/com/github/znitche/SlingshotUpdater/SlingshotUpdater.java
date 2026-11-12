@@ -66,8 +66,11 @@ public class SlingshotUpdater {
         return signatureValidationResult && hashValidationResult;
     }
 
-    private void extractReleaseZip() {
-        throw new UnsupportedOperationException("Not implemented yet");
+    private void extractReleaseZip() throws IOException {
+        RevisionFilesURLs filesPaths = SlingshotUpdaterPlugin.updaterHelpers.getRevisionTmpFilesURLs();
+        File targetDir = SlingshotUpdaterPlugin.updaterHelpers.getRevisionDir(RevisionDirectoryType.CURRENT);
+
+        FilesUtils.unzipArchive(filesPaths.zip, targetDir);
     }
 
     private RevisionMetadata getRevisionMetadata() {
@@ -83,7 +86,7 @@ public class SlingshotUpdater {
         return null;
     }
 
-    public Boolean checkForUpdate() {
+    public Boolean checkForUpdate() throws Exception {
         RevisionMetadata metadata = this.getRevisionMetadata();
 
         if (metadata == null) {
