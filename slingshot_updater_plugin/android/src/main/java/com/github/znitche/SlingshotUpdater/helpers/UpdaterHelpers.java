@@ -77,7 +77,7 @@ public class UpdaterHelpers {
         );
     }
 
-    public void createTmpDir() throws IOException {
+    public void createRevisionTmpDir() throws IOException {
         Files.createDirectories(this.getRevisionDir(RevisionDirectoryType.TMP).toPath());
     }
 
@@ -133,5 +133,19 @@ public class UpdaterHelpers {
         );
 
         return prefs.getString(key, null);
+    }
+
+    public void removePreferencesStorageItem(String key) {
+        SharedPreferences prefs = this.context.getSharedPreferences(
+                Consts.SLINGSHOT_PREFERENCES_KEY,
+                Context.MODE_PRIVATE
+        );
+
+        prefs.edit().remove(key).apply();
+    }
+
+    public void removeRevisionDetailsFile() {
+        File file = new File(context.getFilesDir(), "revision.json");
+        file.delete();
     }
 }

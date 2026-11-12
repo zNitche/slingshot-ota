@@ -39,7 +39,7 @@ public class SlingshotUpdater {
             File tmpZip = SlingshotUpdaterPlugin.apiClient.downloadRevisionFile(metadata.release_url);
             File tmpSig = SlingshotUpdaterPlugin.apiClient.downloadRevisionFile(metadata.sig_url);
 
-            SlingshotUpdaterPlugin.updaterHelpers.createTmpDir();
+            SlingshotUpdaterPlugin.updaterHelpers.createRevisionTmpDir();
 
             Files.move(tmpZip.toPath(), tmpFilesURLs.zip.toPath());
             Files.move(tmpSig.toPath(), tmpFilesURLs.signature.toPath());

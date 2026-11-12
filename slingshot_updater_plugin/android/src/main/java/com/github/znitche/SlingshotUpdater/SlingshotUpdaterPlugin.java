@@ -145,7 +145,34 @@ public class SlingshotUpdaterPlugin extends Plugin {
     }
 
     private void validateRevisionForCurrentVersion() {
-        return;
+        RevisionDetails currentRevisionDetails = updaterHelpers.readRevisionDetailsFromFile();
+        String appVersion = updaterHelpers.getAppVersion();
+
+        if (currentRevisionDetails.appVersion.equals(appVersion)) {
+            return;
+        }
+
+        Log.d("[SHT]", "current revision target app version doesn't match app version, removing");
+
+        updaterHelpers.removePreferencesStorageItem(Consts.SLINGSHOT_REVISION_KEY);
+
+        updaterHelpers.removeRevisionDir(RevisionDirectoryType.CURRENT);
+        updaterHelpers.removeRevisionDir(RevisionDirectoryType.TMP);
+
+        updaterHelpers.removeRevisionDetailsFile();
+
+        Log.d("[SHT]", "current revision related files has been purged, fallback to capacitorDefaultURL");
+
+        String capacitorDefaultURL = updaterHelpers.readFromPreferencesStorage(Consts.SLINGSHOT_CAPACITOR_DEFAULT_SERVER_PATH_KEY);
+
+        if (capacitorDefaultURL == null) {
+            return;
+        }
+
+        Log.d("[SHT]", "setting capacitor default url to: " + capacitorDefaultURL);
+
+        this.capBridge.setServerBasePath(capacitorDefaultURL);
+        this.reloadWebView(true);
     }
 
     private void setSlingshotRevision() throws Exception {
