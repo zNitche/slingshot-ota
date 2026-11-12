@@ -29,6 +29,11 @@ public class SlingshotUpdater {
 
     public String get_revision_number() {
         RevisionDetails revisionDetails = SlingshotUpdaterPlugin.updaterHelpers.readRevisionDetailsFromFile();
+
+        if (revisionDetails == null) {
+            return null;
+        }
+
         return revisionDetails.revisionNumber;
     }
 
