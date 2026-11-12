@@ -123,7 +123,8 @@ public class SlingshotUpdater {
         SlingshotUpdaterPlugin.updaterHelpers.removeRevisionDir(RevisionDirectoryType.TMP);
 
         Log.d("[SHT]", "saved new revision, removed tmp dir");
+        SlingshotUpdaterPlugin.updaterHelpers.writeRevisionNumberToFile(metadata.sha256sum);
 
-        return false;
+        return true;
     }
 }

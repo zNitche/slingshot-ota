@@ -13,7 +13,9 @@ import com.github.znitche.SlingshotUpdater.classes.RevisionMetadata;
 import com.github.znitche.SlingshotUpdater.classes.SlingshotConfig;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.util.Objects;
 
@@ -25,7 +27,8 @@ public class UpdaterHelpers {
     }
 
     public SlingshotConfig loadSlingshotConfig() throws IOException {
-        return SlingshotUpdaterPlugin.filesUtils.loadJson(SlingshotConfig.class, "slingshot.json");
+        InputStream fileStream = this.context.getAssets().open("slingshot.json");
+        return SlingshotUpdaterPlugin.filesUtils.loadJson(SlingshotConfig.class, fileStream);
     }
 
     public String getAppVersion() {
@@ -43,13 +46,20 @@ public class UpdaterHelpers {
         return SlingshotUpdaterPlugin.filesUtils.fileExists("revision.json");
     }
 
+    public void writeRevisionDetailsToFile(RevisionDetails details) throws IOException {
+        SlingshotUpdaterPlugin.filesUtils.dumpJson(details, "revision.json");
+    }
+
     public RevisionDetails readRevisionDetailsFromFile() {
         if (!doesRevisionNumberFileExist()) {
             return null;
         }
 
         try {
-            return SlingshotUpdaterPlugin.filesUtils.loadJson(RevisionDetails.class, "revision.json");
+            File file = new File(context.getFilesDir(), "revision.json");
+            InputStream fileStream = new FileInputStream(file);
+
+            return SlingshotUpdaterPlugin.filesUtils.loadJson(RevisionDetails.class, fileStream);
         } catch (IOException e) {
             Log.d("[SHT]", "readRevisionDetailsFromFile error: " + e);
             return null;
@@ -74,7 +84,7 @@ public class UpdaterHelpers {
     }
 
     public void removeRevisionDir(RevisionDirectoryType dirType) {
-        SlingshotUpdaterPlugin.filesUtils.removeDirectory(this.getRevisionDir(dirType));
+        FilesUtils.removeDirectory(this.getRevisionDir(dirType));
     }
 
     public Boolean checkIfNewRevisionShouldBeFetched(RevisionMetadata metadata) {
@@ -85,5 +95,23 @@ public class UpdaterHelpers {
         }
 
         return Boolean.TRUE;
+    }
+
+    public Boolean checkRevisionDirectory() {
+        File revisionDirFile = getRevisionDir(RevisionDirectoryType.CURRENT);
+        File indexHtmlFile = new File(revisionDirFile.toPath().toFile(), "index.html");
+
+        return indexHtmlFile.exists();
+    }
+
+    public void writeRevisionNumberToFile(String num) throws Exception {
+        String appVersion = this.getAppVersion();
+
+        if (appVersion == null) {
+            throw new Exception("couldn't get app version");
+        }
+
+        RevisionDetails details = new RevisionDetails(num, appVersion);
+        this.writeRevisionDetailsToFile(details);
     }
 }

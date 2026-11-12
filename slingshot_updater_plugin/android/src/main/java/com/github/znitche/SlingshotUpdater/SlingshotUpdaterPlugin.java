@@ -3,12 +3,14 @@ package com.github.znitche.SlingshotUpdater;
 import android.content.Context;
 import android.util.Log;
 
+import com.getcapacitor.Bridge;
 import com.getcapacitor.JSObject;
 import com.getcapacitor.Plugin;
 import com.getcapacitor.PluginCall;
 import com.getcapacitor.PluginMethod;
 import com.getcapacitor.annotation.CapacitorPlugin;
 import com.github.znitche.SlingshotUpdater.classes.AppStateListener;
+import com.github.znitche.SlingshotUpdater.classes.RevisionDetails;
 import com.github.znitche.SlingshotUpdater.classes.SlingshotConfig;
 import com.github.znitche.SlingshotUpdater.core.api.ApiClient;
 import com.github.znitche.SlingshotUpdater.helpers.FilesUtils;
@@ -16,15 +18,13 @@ import com.github.znitche.SlingshotUpdater.helpers.UpdaterHelpers;
 import com.github.znitche.SlingshotUpdater.core.AppStateManager;
 import com.github.znitche.SlingshotUpdater.core.MainLoopPoolingTask;
 
-import kotlin.NotImplementedError;
-import retrofit2.Call;
-
 /**
  * Please read the Capacitor Android Plugin Development Guide
  * here: https://capacitorjs.com/docs/plugins/android
  */
 @CapacitorPlugin(name = "SlingshotUpdater")
 public class SlingshotUpdaterPlugin extends Plugin {
+    private final Bridge capBridge = getBridge();
     private final SlingshotUpdater implementation = new SlingshotUpdater();
     private MainLoopPoolingTask mainLoopPoolingTask = null;
     private AppStateManager appStateManager;
@@ -103,11 +103,21 @@ public class SlingshotUpdaterPlugin extends Plugin {
         this.mainLoopPoolingTask = new MainLoopPoolingTask(
                 () -> {
                     try {
-                        Boolean gotNewRevision = this.implementation.checkForUpdate();
+                        Log.d("[SHT]", "mainloopPoolingTask start");
 
+                        this.validateRevisionForCurrentVersion();
+
+                        Boolean gotNewRevision = this.implementation.checkForUpdate();
                         Log.d("[SHT]", "got new revision ? : " + gotNewRevision);
+
+                        if (gotNewRevision) {
+                            Log.d("[SHT]", "setting up new revision/release");
+                            this.setSlingshotRevision();
+                        }
                     } catch (Exception e) {
                         Log.d("[SHT]", "mainLoopPoolingTask error: " + e);
+                    } finally {
+                        Log.d("[SHT]", "mainloopPoolingTask done");
                     }
                 },
                 this.pluginConfig.getIsPeriodicUpdater(),
@@ -122,10 +132,21 @@ public class SlingshotUpdaterPlugin extends Plugin {
     }
 
     private void validateRevisionForCurrentVersion() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return;
     }
 
-    private void setSlingshotRevision() {
-        throw new UnsupportedOperationException("Not implemented yet");
+    private void setSlingshotRevision() throws Exception {
+        if (!updaterHelpers.doesRevisionNumberFileExist()) {
+            return;
+        }
+
+        RevisionDetails revisionDetails = updaterHelpers.readRevisionDetailsFromFile();
+
+        if (!updaterHelpers.checkRevisionDirectory()) {
+            throw new Exception("index.html of current revision doesn't exist");
+        }
+
+        return;
+//        capBridge.setServerBasePath();
     }
 }
