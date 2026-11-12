@@ -57,9 +57,9 @@ public class FilesUtils {
     }
 
     public void writeToFile(String fileName, String data) throws IOException {
-        try (FileOutputStream fos = this.context.openFileOutput(
-                fileName, Context.MODE_PRIVATE)) {
+        File file = new File(context.getFilesDir(), fileName);
 
+        try (FileOutputStream fos = new FileOutputStream(file)) {
             fos.write(data.getBytes(StandardCharsets.UTF_8));
         }
     }
@@ -68,13 +68,12 @@ public class FilesUtils {
         Gson gson = new Gson();
         String dump = gson.toJson(obj);
 
-        writeToFile(dump, fileName);
+        writeToFile(fileName, dump);
     }
 
-    public <T> T loadJson(Class<T> targetClass, String fileName) throws IOException {
+    public <T> T loadJson(Class<T> targetClass, InputStream fileStream) throws IOException {
         Gson gson = new Gson();
 
-        InputStream fileStream = this.context.getAssets().open(fileName);
         InputStreamReader fileReader =
                 new InputStreamReader(fileStream, StandardCharsets.UTF_8);
 
