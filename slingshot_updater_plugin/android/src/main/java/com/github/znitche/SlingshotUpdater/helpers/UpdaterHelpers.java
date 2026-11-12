@@ -1,6 +1,7 @@
 package com.github.znitche.SlingshotUpdater.helpers;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.util.Log;
@@ -11,6 +12,7 @@ import com.github.znitche.SlingshotUpdater.classes.RevisionDirectoryType;
 import com.github.znitche.SlingshotUpdater.classes.RevisionFilesURLs;
 import com.github.znitche.SlingshotUpdater.classes.RevisionMetadata;
 import com.github.znitche.SlingshotUpdater.classes.SlingshotConfig;
+import com.github.znitche.SlingshotUpdater.core.Consts;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -113,5 +115,23 @@ public class UpdaterHelpers {
 
         RevisionDetails details = new RevisionDetails(num, appVersion);
         this.writeRevisionDetailsToFile(details);
+    }
+
+    public void writeToPreferencesStorage(String key, String details) {
+        SharedPreferences prefs = this.context.getSharedPreferences(
+                Consts.SLINGSHOT_PREFERENCES_KEY,
+                Context.MODE_PRIVATE
+        );
+
+        prefs.edit().putString(key, details).apply();
+    }
+
+    public String readFromPreferencesStorage(String key) {
+        SharedPreferences prefs = this.context.getSharedPreferences(
+                Consts.SLINGSHOT_PREFERENCES_KEY,
+                Context.MODE_PRIVATE
+        );
+
+        return prefs.getString(key, null);
     }
 }

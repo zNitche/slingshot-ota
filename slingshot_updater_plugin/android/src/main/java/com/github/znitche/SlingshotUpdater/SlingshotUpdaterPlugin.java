@@ -13,6 +13,7 @@ import com.github.znitche.SlingshotUpdater.classes.AppStateListener;
 import com.github.znitche.SlingshotUpdater.classes.RevisionDetails;
 import com.github.znitche.SlingshotUpdater.classes.RevisionDirectoryType;
 import com.github.znitche.SlingshotUpdater.classes.SlingshotConfig;
+import com.github.znitche.SlingshotUpdater.core.Consts;
 import com.github.znitche.SlingshotUpdater.core.api.ApiClient;
 import com.github.znitche.SlingshotUpdater.helpers.FilesUtils;
 import com.github.znitche.SlingshotUpdater.helpers.UpdaterHelpers;
@@ -157,6 +158,8 @@ public class SlingshotUpdaterPlugin extends Plugin {
         if (!updaterHelpers.checkRevisionDirectory()) {
             throw new Exception("index.html of current revision doesn't exist");
         }
+
+        updaterHelpers.writeToPreferencesStorage(Consts.SLINGSHOT_REVISION_KEY, revisionDetails.revisionNumber);
 
         File revisionDir = updaterHelpers.getRevisionDir(RevisionDirectoryType.CURRENT);
         this.capBridge.setServerBasePath(revisionDir.getPath());
