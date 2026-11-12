@@ -40,7 +40,7 @@ def current_revision(app_version: str):
 
     with open(os.path.join(storage_path, "release.zip.sha256"),
               "r") as hash_file:
-        sha256sum = hash_file.read().split("=")[1].replace(" ", "")
+        sha256sum = hash_file.read().split("=")[1].replace(" ", "").strip("\n")
 
     release_url = url_for("api.current_revision_item",
                           app_version=app_version,
