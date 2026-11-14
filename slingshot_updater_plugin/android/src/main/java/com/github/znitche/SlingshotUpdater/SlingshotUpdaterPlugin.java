@@ -175,10 +175,7 @@ public class SlingshotUpdaterPlugin extends Plugin {
 
         Log.d("[SHT]", "setting capacitor default url to: " + capacitorDefaultURL);
 
-        // take a look into this one
-        updaterHelpers.setCapacitorWebViewServerPathValue(capacitorDefaultURL);
         this.capBridge.setServerBasePath(capacitorDefaultURL);
-
         this.reloadWebView(true);
     }
 
@@ -197,11 +194,7 @@ public class SlingshotUpdaterPlugin extends Plugin {
 
         File revisionDir = updaterHelpers.getRevisionDir(RevisionDirectoryType.CURRENT);
 
-        String newPath = revisionDir.getPath();
-
-        this.capBridge.setServerBasePath(newPath);
-        updaterHelpers.setCapacitorWebViewServerPathValue(newPath);
-
+        this.capBridge.setServerBasePath(revisionDir.getPath());
         this.reloadWebView(false);
     }
 }
