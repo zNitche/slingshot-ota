@@ -145,6 +145,10 @@ public class SlingshotUpdaterPlugin extends Plugin {
     }
 
     private void validateRevisionForCurrentVersion() {
+        if (!updaterHelpers.doesRevisionNumberFileExist()) {
+            return;
+        }
+
         RevisionDetails currentRevisionDetails = updaterHelpers.readRevisionDetailsFromFile();
         String appVersion = updaterHelpers.getAppVersion();
 
@@ -171,7 +175,10 @@ public class SlingshotUpdaterPlugin extends Plugin {
 
         Log.d("[SHT]", "setting capacitor default url to: " + capacitorDefaultURL);
 
+        // take a look into this one
+        updaterHelpers.setCapacitorWebViewServerPathValue(capacitorDefaultURL);
         this.capBridge.setServerBasePath(capacitorDefaultURL);
+
         this.reloadWebView(true);
     }
 
@@ -189,7 +196,11 @@ public class SlingshotUpdaterPlugin extends Plugin {
         updaterHelpers.writeToPreferencesStorage(Consts.SLINGSHOT_REVISION_KEY, revisionDetails.revisionNumber);
 
         File revisionDir = updaterHelpers.getRevisionDir(RevisionDirectoryType.CURRENT);
-        this.capBridge.setServerBasePath(revisionDir.getPath());
+
+        String newPath = revisionDir.getPath();
+
+        this.capBridge.setServerBasePath(newPath);
+        updaterHelpers.setCapacitorWebViewServerPathValue(newPath);
 
         this.reloadWebView(false);
     }

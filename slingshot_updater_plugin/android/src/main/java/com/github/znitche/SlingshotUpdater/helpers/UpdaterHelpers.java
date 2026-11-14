@@ -6,6 +6,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.util.Log;
 
+import com.getcapacitor.plugin.WebView;
 import com.github.znitche.SlingshotUpdater.SlingshotUpdaterPlugin;
 import com.github.znitche.SlingshotUpdater.classes.RevisionDetails;
 import com.github.znitche.SlingshotUpdater.classes.RevisionDirectoryType;
@@ -147,5 +148,20 @@ public class UpdaterHelpers {
     public void removeRevisionDetailsFile() {
         File file = new File(context.getFilesDir(), "revision.json");
         file.delete();
+    }
+
+    public void setCapacitorWebViewServerPathValue(String newPath) {
+        SharedPreferences prefs = this.context.getSharedPreferences(
+                WebView.WEBVIEW_PREFS_NAME,
+                Context.MODE_PRIVATE
+        );
+
+        if (this.readFromPreferencesStorage(Consts.SLINGSHOT_CAPACITOR_DEFAULT_SERVER_PATH_KEY) == null) {
+            this.writeToPreferencesStorage(Consts.SLINGSHOT_CAPACITOR_DEFAULT_SERVER_PATH_KEY, WebView.CAP_SERVER_PATH);
+        }
+
+        prefs.edit()
+                .putString(WebView.CAP_SERVER_PATH, newPath)
+                .apply();
     }
 }
