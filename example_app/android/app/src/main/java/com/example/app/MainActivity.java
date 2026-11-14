@@ -1,5 +1,7 @@
 package com.example.app;
 
-import com.getcapacitor.BridgeActivity;
+import com.github.znitche.SlingshotUpdater.SlingshotCustomBridgeActivity;
 
-public class MainActivity extends BridgeActivity {}
+public class MainActivity extends SlingshotCustomBridgeActivity {
+
+}
