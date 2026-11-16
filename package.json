@@ -1,7 +1,7 @@
 {
     "name": "slingshot-node-monorepo",
-    "version": "0.0.0",
-    "description": "POC of OTA updater for capacitor.js",
+    "version": "0.0.1",
+    "description": "Proof of Concept for Capacitor.js Over-the-Air updater plugin",
     "homepage": "https://github.com/zNitche/slingshot-ota#readme",
     "repository": {
         "type": "git",
